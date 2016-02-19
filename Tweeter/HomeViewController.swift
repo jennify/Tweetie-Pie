@@ -9,10 +9,11 @@
 import UIKit
 
 
-class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
     var tweets: [Tweet]?
-    
+    var isMoreDataLoading = false
     @IBOutlet weak var tableView: UITableView!
+    var loadingMoreView:InfiniteScrollActivityView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,6 +24,21 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
         
+        // Initialize a UIRefreshControl
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
+        tableView.insertSubview(refreshControl, atIndex: 0)
+        
+        // Set up Infinite Scroll loading indicator
+        let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
+        loadingMoreView = InfiniteScrollActivityView(frame: frame)
+        loadingMoreView!.hidden = true
+        tableView.addSubview(loadingMoreView!)
+        
+        var insets = tableView.contentInset;
+        insets.bottom += InfiniteScrollActivityView.defaultHeight;
+        tableView.contentInset = insets
+        
         Tweet.homeTimelineWithParams(nil) {
             (tweets: [Tweet]?, error: NSError?) in
             self.tweets = tweets
@@ -32,6 +48,19 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @IBAction func onLogout(sender: AnyObject) {
         User.currentUser?.logout()
+    }
+    
+    func refreshControlAction(refreshControl: UIRefreshControl) {
+        Tweet.homeTimelineWithParams(nil) {
+            (refreshed_tweets: [Tweet]?, error: NSError?) in
+            if refreshed_tweets != nil {
+                self.tweets = refreshed_tweets
+                self.tableView.reloadData()
+            } else {
+                print("Network Error")
+            }
+            refreshControl.endRefreshing()
+        }
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -45,4 +74,33 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         return self.tweets?.count ?? 0
     }
     
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if (!isMoreDataLoading) {
+            // Calculate the position of one screen length before the bottom of the results
+            let scrollViewContentHeight = tableView.contentSize.height
+            let scrollOffsetThreshold = scrollViewContentHeight - tableView.bounds.size.height
+            
+            // When the user has scrolled past the threshold, start requesting
+            if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.dragging) {
+                isMoreDataLoading = true
+
+                // Update position of loadingMoreView, and start loading indicator
+                let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
+                loadingMoreView?.frame = frame
+                loadingMoreView!.startAnimating()
+
+                Tweet.loadMoreHomeTimelineWithLastTweet((self.tweets?[self.tweets!.count - 1])!) {
+                    (tweets: [Tweet]?, error: NSError?) in
+                    if tweets != nil {
+                        self.tweets?.appendContentsOf(tweets!)
+                        self.loadingMoreView!.stopAnimating()
+                        self.tableView.reloadData()
+                        self.isMoreDataLoading = false
+                    } else {
+                        print("\(error)")
+                    }
+                }
+            }
+        }
+    }
 }

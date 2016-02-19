@@ -17,6 +17,7 @@ class Tweet: NSObject {
     var sinceCreatedString: String?
     var createAt: NSDate?
     var retweetedBy: User?
+    var tweetID: Int?
     
     init(dictionary: NSDictionary) {
         user = User(dictionary: dictionary["user"] as! NSDictionary)
@@ -24,10 +25,14 @@ class Tweet: NSObject {
         createdAtString = dictionary["created_at"] as? String
         createAt = DateFormatter.dateFromString(createdAtString)
         sinceCreatedString = DateFormatter.sinceNowFormat(createAt)
-        
-//        retweetedBy =
+        let id_str = dictionary["id_str"] as? String
+        if id_str != nil {
+            tweetID = Int(id_str!)
+        }
         
     }
+    
+    
     
     func favorite() {
         
@@ -43,6 +48,12 @@ class Tweet: NSObject {
     
     class func homeTimelineWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
         TwitterClient.sharedInstance.homeTimelineWithParams(nil , completion:  completion)
+    }
+    
+    class func loadMoreHomeTimelineWithLastTweet(lastTweet: Tweet, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
+
+        let params: NSDictionary = ["since_id": (lastTweet.tweetID)!]
+        TwitterClient.sharedInstance.homeTimelineWithParams(params , completion:  completion)
     }
     
     class func tweetsWithArray(array: [NSDictionary]) -> [Tweet] {

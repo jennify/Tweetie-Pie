@@ -21,6 +21,7 @@
 		7AF8CBAE1C76FE6D00925337 /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF8CBAD1C76FE6D00925337 /* ComposeViewController.swift */; };
 		7AF8CBB01C76FE9700925337 /* TweetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF8CBAF1C76FE9700925337 /* TweetViewController.swift */; };
 		7AF8CBB21C7703BB00925337 /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF8CBB11C7703BB00925337 /* DateFormatter.swift */; };
+		7AF8CBB41C771FEA00925337 /* InfiniteScrollActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AF8CBB31C771FEA00925337 /* InfiniteScrollActivityView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		7AF8CBAD1C76FE6D00925337 /* ComposeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
 		7AF8CBAF1C76FE9700925337 /* TweetViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TweetViewController.swift; sourceTree = "<group>"; };
 		7AF8CBB11C7703BB00925337 /* DateFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
+		7AF8CBB31C771FEA00925337 /* InfiniteScrollActivityView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfiniteScrollActivityView.swift; sourceTree = "<group>"; };
 		927829C51DDBAC71D178C0C1 /* Pods_Tweeter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tweeter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -123,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				7A86C1D81C76D71100EB9A98 /* HomeTweetCell.swift */,
+				7AF8CBB31C771FEA00925337 /* InfiniteScrollActivityView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 				7AF8CBB01C76FE9700925337 /* TweetViewController.swift in Sources */,
 				7AEB617B1C76D37500EB0452 /* AppDelegate.swift in Sources */,
 				7AF8CBB21C7703BB00925337 /* DateFormatter.swift in Sources */,
+				7AF8CBB41C771FEA00925337 /* InfiniteScrollActivityView.swift in Sources */,
 				7AF8CBAE1C76FE6D00925337 /* ComposeViewController.swift in Sources */,
 				7A86C1DB1C76D73200EB9A98 /* Tweet.swift in Sources */,
 				7A86C1D91C76D71100EB9A98 /* HomeTweetCell.swift in Sources */,
