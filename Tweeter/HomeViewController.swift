@@ -54,7 +54,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
         let destViewController = segue.destinationViewController
 
-        if segue.identifier == "replySegue"{
+        if segue.identifier == "replySegue" {
             
             let button = sender as? UIButton
             let cell = button?.superview?.superview as? HomeTweetCell
@@ -63,6 +63,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             let composerViewController = navigationController?.topViewController as? ComposeViewController
             composerViewController?.inReplyToTweet = cell?.tweet
 
+        } else if segue.identifier == "detailsSegue" {
+            let cell = sender as? HomeTweetCell
+            let detailsViewController = destViewController as? TweetViewController
+            detailsViewController?.tweet = cell?.tweet
+            
         }
     }
     

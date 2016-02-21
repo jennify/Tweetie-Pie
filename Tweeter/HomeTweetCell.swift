@@ -74,7 +74,6 @@ class HomeTweetCell: UITableViewCell {
     }
 
     @IBAction func onReply(sender: AnyObject) {
-//        self.performSegueWithIdentifier("replySegue", sender: self)
         
     }
     
