@@ -14,6 +14,11 @@ let twitterConsumerSecret = "hAtR2FelrUrrqpjezPDrtxt5EKfgl4VIN4BvhICPyj6PzL0sMs"
 let twitterBaseURL = NSURL(string: "https://api.twitter.com")
 
 class TwitterClient: BDBOAuth1RequestOperationManager {
+    // REST APIs for twitter: https://dev.twitter.com/rest/public
+    
+    enum NetworkRequest {
+        case GET, POST
+    }
     
     var loginCompletion: ((user: User?, error: NSError?) -> ())?
     
@@ -27,25 +32,103 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         return Static.instance
     }
     
+    func retweet(id: String, completion: (tweet: Tweet?, error: NSError?) -> ()) {
+        let url = "1.1/statuses/retweet/\(id).json"
+        requestTwitterWithTweetResponse(NetworkRequest.POST, url: url, queryParams: nil, parameters: nil, completion: completion)
+    }
     
-    func loginWithCompletion(completion: (user: User?, error: NSError?) -> ()) {
-        self.loginCompletion = completion
-        TwitterClient.sharedInstance.requestSerializer.removeAccessToken()
-        TwitterClient.sharedInstance.fetchRequestTokenWithPath("oauth/request_token", method: "GET", callbackURL: NSURL(string:"tweetiepy://oauth"), scope: nil, success: { (requestToken: BDBOAuth1Credential!) -> Void in
-                let authURL = NSURL(string: "https://api.twitter.com/oauth/authorize?oauth_token=\(requestToken.token)")
-                UIApplication.sharedApplication().openURL(authURL!)
-            }, failure: { (error: NSError! ) -> Void in
-                print("Failed to get token")
-        })
+    func unretweet(id: String, completion: (tweet: Tweet?, error: NSError?) -> ()) {
+        let url = "1.1/statuses/unretweet/\(id).json"
+        requestTwitterWithTweetResponse(NetworkRequest.POST, url: url, queryParams: nil, parameters: nil, completion: completion)
+    }
+    
+    func favorite(id_str: String, completion: (tweet: Tweet?, error: NSError?) -> ()) {
+        let url = "1.1/favorites/create.json"
+        requestTwitterWithTweetResponse(NetworkRequest.POST, url: url, queryParams: ["id" : id_str], parameters: nil, completion: completion)
+    }
+    
+    func unfavorite(id_str: String, completion: (tweet: Tweet?, error: NSError?) -> ()) {
+        let url = "1.1/favorites/destroy.json"
+        requestTwitterWithTweetResponse(NetworkRequest.POST, url: url, queryParams: ["id" : id_str], parameters: nil, completion: completion)
+    }
+    
+    func buildURLWithQueryParams(url: String, queryParams: [String:String]?) -> String {
+        var urlWithQueryParams = url
+        print(queryParams)
+        if queryParams != nil {
+            urlWithQueryParams.appendContentsOf("?")
+            for qp in queryParams! {
+                let qp1: String = qp.1.stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet())!
+                urlWithQueryParams.appendContentsOf(qp.0 + "=" + qp1 + "&")
+            }
+        }
+        if urlWithQueryParams[urlWithQueryParams.endIndex.predecessor()] == "&" {
+            urlWithQueryParams = String(urlWithQueryParams.characters.dropLast())
+        }
+        print(urlWithQueryParams)
+
+        return urlWithQueryParams
+    }
+    
+    func requestTwitter(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (response: AnyObject?, error: NSError?) -> ()) {
+        
+        let urlWithQueryParams = buildURLWithQueryParams(url , queryParams: queryParams)
+        if mode == NetworkRequest.GET {
+            GET(urlWithQueryParams, parameters: parameters, success:  { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
+                completion(response: response, error: nil)
+                }, failure: { (operation: AFHTTPRequestOperation?, error: NSError) -> Void in
+                    completion(response: nil, error: error)
+            })
+        } else if mode == NetworkRequest.POST {
+            
+            POST(urlWithQueryParams, parameters: parameters, success:  { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
+                    completion(response: response, error: nil)
+                }, failure: { (operation: AFHTTPRequestOperation?, error: NSError) -> Void in
+                    completion(response: nil, error: error)
+            })
+        } else {
+            print("requestTwitter with unknown mode: \(mode)")
+        }
+    }
+    
+    func requestTwitterWithTweetResponse(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (tweet: Tweet?, error: NSError?) -> ()) {
+        requestTwitter(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: parameters) {
+            (response: AnyObject?, error: NSError?) in
+            var tweet: Tweet? = nil
+            if response != nil {
+                tweet = Tweet(dictionary: response as! NSDictionary)
+            }
+            completion(tweet:tweet, error: error)
+        }
     }
     
     func homeTimelineWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
-        
         GET("1.1/statuses/home_timeline.json", parameters: nil, success:  { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
                 let tweets = Tweet.tweetsWithArray(response as! [NSDictionary])
                 completion(tweets: tweets, error: nil)
             }, failure: { (operation: AFHTTPRequestOperation?, error: NSError) -> Void in
                 completion(tweets: nil, error: error)
+        })
+    }
+    
+    func publishTweet(text: String, in_reply_tweet_id: Int?, completion: (tweet: Tweet?, error: NSError?) -> ()) {
+        let url = "1.1/statuses/update.json"
+        var queryParams = ["status": text]
+        if in_reply_tweet_id != nil {
+            queryParams["in_reply_to_status_id"] =  "\(in_reply_tweet_id!)"
+        }
+        
+        requestTwitterWithTweetResponse(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: nil, completion: completion)
+    }
+    
+    func loginWithCompletion(completion: (user: User?, error: NSError?) -> ()) {
+        self.loginCompletion = completion
+        TwitterClient.sharedInstance.requestSerializer.removeAccessToken()
+        TwitterClient.sharedInstance.fetchRequestTokenWithPath("oauth/request_token", method: "GET", callbackURL: NSURL(string:"tweetiepy://oauth"), scope: nil, success: { (requestToken: BDBOAuth1Credential!) -> Void in
+            let authURL = NSURL(string: "https://api.twitter.com/oauth/authorize?oauth_token=\(requestToken.token)")
+            UIApplication.sharedApplication().openURL(authURL!)
+            }, failure: { (error: NSError! ) -> Void in
+                print("Failed to get token")
         })
     }
     

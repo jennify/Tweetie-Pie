@@ -20,24 +20,100 @@ class HomeTweetCell: UITableViewCell {
     @IBOutlet weak var tweetTextLabel: UILabel!
     @IBOutlet weak var profileImageView: UIImageView!
     
+    @IBOutlet weak var favoriteButton: UIButton!
+    @IBOutlet weak var retweetButton: UIButton!
+    
+    var favorited: Bool! {
+        didSet {
+            var imageName = "like-action"
+            if favorited == true {
+                imageName = "like-action-on-pressed-red"
+            }
+            self.favoriteButton.setImage(UIImage(named: imageName), forState: UIControlState.Normal)
+        }
+    }
+    var retweeted: Bool! {
+        didSet {
+            var imageName = "retweet-default"
+            if retweeted == true {
+                imageName = "retweet-pressed-green"
+            }
+            self.retweetButton.setImage(UIImage(named: imageName), forState: UIControlState.Normal)
+        }
+    }
+    
     var tweet: Tweet! {
         didSet {
-            retweetLabel.text = "TODO Jlee$$"
             nameLabel.text = tweet.user?.name
-            usernameLabel.text = tweet.user?.screenname
+            if tweet.user?.screenname != nil {
+                usernameLabel.text = "@" + (tweet.user?.screenname)!
+            }
             timestampLabel.text = tweet.sinceCreatedString
             tweetTextLabel.text = tweet.text
             profileImageView.setImageWithURL(NSURL(string: (tweet.user?.profileImageUrl)!)!)
+            
+            if tweet.retweetedBy != nil {
+                retweetLabel.text = "@" + (tweet.retweetedBy?.screenname)! + " retweeted"
+                retweetLabel.hidden = false
+            } else if tweet.in_reply_to_screen_name != nil {
+                retweetLabel.text = "In reply to @" + (tweet.in_reply_to_screen_name)!
+                retweetLabel.hidden = false
+            } else {
+                retweetLabel.hidden = true
+            }
+
+            // Set state variables.
+            favorited = tweet.favorited
+            retweeted = tweet.retweeted
+            
+            // Set up "hover" images for buttons.
+            favoriteButton.setImage(UIImage(named: "like-action-hover"), forState: UIControlState.Highlighted)
+            retweetButton.setImage(UIImage(named: "retweet-hover"), forState: UIControlState.Highlighted)
+            
         }
     }
 
     @IBAction func onReply(sender: AnyObject) {
+//        self.performSegueWithIdentifier("replySegue", sender: self)
+        
     }
     
     @IBAction func onRetweet(sender: AnyObject) {
+        if self.retweeted == false {
+            tweet.retweet() {
+                (tweet:Tweet?, error:NSError?) in
+                if error == nil {
+                    self.retweeted = true
+                }
+
+            }
+        } else {
+            tweet.unretweet() {
+                (tweet:Tweet?, error:NSError?) in
+                if error == nil {
+                    self.retweeted = false
+                }
+            }
+        }
     }
     
+    
     @IBAction func onFavorite(sender: AnyObject) {
+        if self.favorited == false {
+            tweet.favorite() {
+                (tweet:Tweet?, error:NSError?) in
+                if error == nil {
+                    self.favorited = true
+                }
+            }
+        } else {
+            tweet.unfavorite() {
+                (tweet:Tweet?, error:NSError?) in
+                if error == nil {
+                    self.favorited = false
+                }
+            }
+        }
     }
     
 }

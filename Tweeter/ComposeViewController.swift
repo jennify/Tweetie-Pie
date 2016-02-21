@@ -8,12 +8,34 @@
 
 import UIKit
 
-class ComposeViewController: UIViewController {
+//protocol ComposeViewControllerDelegate {
+//    optional func composeViewController(composeViewController: ComposeViewController)
+//}
 
+class ComposeViewController: UIViewController, UITextViewDelegate {
+
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var usernameLabel: UILabel!
+    @IBOutlet weak var characterCountLabel: UILabel!
+    @IBOutlet weak var profileImageView: UIImageView!
+    @IBOutlet weak var composerTextView: UITextView!
+    @IBOutlet weak var composerPlaceholderLabel: UILabel!
+    var inReplyToTweet: Tweet?
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        self.nameLabel.text = User.currentUser?.name
+        self.usernameLabel.text = "@\((User.currentUser?.screenname)!)"
+        self.composerTextView.delegate = self
+        updateNumChars()
+        self.profileImageView.setImageWithURL(NSURL(string: (User.currentUser?.profileImageUrl)!)!)
+
+        if inReplyToTweet != nil {
+            self.composerTextView.text = "@\((inReplyToTweet?.user!.screenname)!) "
+            self.composerPlaceholderLabel.hidden = true
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -21,7 +43,45 @@ class ComposeViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    @IBAction func onTweet(sender: AnyObject) {
+        Tweet.publishTweet(self.composerTextView.text!, in_reply_tweet_id: inReplyToTweet?.tweetID)  {
+            (tweet: Tweet?, error:NSError?) in
+            if error != nil {
+                print("Failed to post tweet")
+                print(error)
 
+            } else {
+                print("Posted post \(tweet)")
+            }
+        }
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    @IBAction func onCancel(sender: AnyObject) {
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    func textViewShouldBeginEditing(textView: UITextView) -> Bool {
+        self.composerPlaceholderLabel.hidden = true
+        return true
+    }
+    
+    func textViewShouldEndEditing(textView: UITextView) -> Bool {
+        if self.composerTextView.text!.characters.count > 0 {
+            self.composerPlaceholderLabel.hidden = true
+        }
+        return true
+    }
+    
+    
+    func textViewDidChange(textView: UITextView) {
+        updateNumChars()
+    }
+    
+    func updateNumChars() {
+        let numChars = self.composerTextView.text!.characters.count
+        self.characterCountLabel.text = "\(numChars)"
+    }
     /*
     // MARK: - Navigation
 

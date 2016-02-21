@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TwitterLogo_blue" translatesAutoresizingMaskIntoConstraints="NO" id="nSt-U2-3Jn">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TwitterLogo-blue" translatesAutoresizingMaskIntoConstraints="NO" id="nSt-U2-3Jn">
                                 <rect key="frame" x="10" y="134" width="300" height="300"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="300" id="PG6-FJ-Wq4"/>
@@ -38,6 +38,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="TwitterLogo_blue" width="1687" height="1687"/>
+        <image name="TwitterLogo-blue" width="1687" height="1687"/>
     </resources>
 </document>

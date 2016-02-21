@@ -50,6 +50,22 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         User.currentUser?.logout()
     }
     
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
+        let destViewController = segue.destinationViewController
+
+        if segue.identifier == "replySegue"{
+            
+            let button = sender as? UIButton
+            let cell = button?.superview?.superview as? HomeTweetCell
+            
+            let navigationController = destViewController as? UINavigationController
+            let composerViewController = navigationController?.topViewController as? ComposeViewController
+            composerViewController?.inReplyToTweet = cell?.tweet
+
+        }
+    }
+    
     func refreshControlAction(refreshControl: UIRefreshControl) {
         Tweet.homeTimelineWithParams(nil) {
             (refreshed_tweets: [Tweet]?, error: NSError?) in
