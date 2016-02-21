@@ -194,6 +194,7 @@
                                             <outlet property="retweetLabel" destination="XOn-sA-qc7" id="dyY-BB-lr6"/>
                                             <outlet property="timestampLabel" destination="pGM-K4-ydj" id="G55-bY-QWX"/>
                                             <outlet property="tweetMediaImageView" destination="i8r-g9-dE7" id="Onj-uj-9Je"/>
+                                            <outlet property="tweetMediaImageViewConstraint" destination="jxh-z6-46l" id="VT8-Ku-K64"/>
                                             <outlet property="tweetTextLabel" destination="wcl-oK-eqU" id="0pT-hY-dCo"/>
                                             <outlet property="usernameLabel" destination="Bfs-CG-9Qr" id="adI-dS-3j3"/>
                                             <segue destination="YGH-yr-Z3w" kind="push" identifier="detailsSegue" id="u4W-Sc-WvT"/>

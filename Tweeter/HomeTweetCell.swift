@@ -24,6 +24,7 @@ class HomeTweetCell: UITableViewCell {
     @IBOutlet weak var retweetButton: UIButton!
     @IBOutlet weak var tweetMediaImageView: UIImageView!
     
+    @IBOutlet weak var tweetMediaImageViewConstraint: NSLayoutConstraint!
     var favorited: Bool! {
         didSet {
             var imageName = "like-action"
@@ -63,11 +64,11 @@ class HomeTweetCell: UITableViewCell {
                 tweetMediaImageView.layer.cornerRadius = 5
                 tweetMediaImageView.clipsToBounds = true
                 tweetMediaImageView.hidden = false
-//                tweetMediaImageViewHeightConstraint.constant = 231.0
+                tweetMediaImageViewConstraint.constant = 231.0
                 
             } else {
                 tweetMediaImageView.hidden = true
-//                tweetMediaImageViewHeightConstraint.constant = 0.0
+                tweetMediaImageViewConstraint.constant = 0.0
             }
             
             if tweet.retweetedBy != nil {
