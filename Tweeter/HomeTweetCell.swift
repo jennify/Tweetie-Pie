@@ -23,7 +23,6 @@ class HomeTweetCell: UITableViewCell {
     @IBOutlet weak var favoriteButton: UIButton!
     @IBOutlet weak var retweetButton: UIButton!
     @IBOutlet weak var tweetMediaImageView: UIImageView!
-    @IBOutlet weak var tweetMediaImageViewHeightConstraint: NSLayoutConstraint!
     
     var favorited: Bool! {
         didSet {
