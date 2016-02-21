@@ -7,10 +7,8 @@
 //
 
 import UIKit
-
-//protocol ComposeViewControllerDelegate {
-//    optional func composeViewController(composeViewController: ComposeViewController)
-//}
+let tweetCreatedNotification = "ntweetCreated"
+let tweetCreatedKey = "ktweetCreated"
 
 class ComposeViewController: UIViewController, UITextViewDelegate {
 
@@ -31,7 +29,6 @@ class ComposeViewController: UIViewController, UITextViewDelegate {
         self.composerTextView.delegate = self
         updateNumChars()
         self.profileImageView.setImageWithURL(NSURL(string: (User.currentUser?.profileImageUrl)!)!)
-
         if inReplyToTweet != nil {
             self.composerTextView.text = "@\((inReplyToTweet?.user!.screenname)!) "
             self.composerPlaceholderLabel.hidden = true
@@ -44,6 +41,7 @@ class ComposeViewController: UIViewController, UITextViewDelegate {
     }
     
     @IBAction func onTweet(sender: AnyObject) {
+        var userInfo: [NSObject : AnyObject] = [:]
         Tweet.publishTweet(self.composerTextView.text!, in_reply_tweet_id: inReplyToTweet?.tweetID)  {
             (tweet: Tweet?, error:NSError?) in
             if error != nil {
@@ -52,6 +50,9 @@ class ComposeViewController: UIViewController, UITextViewDelegate {
 
             } else {
                 print("Posted post \(tweet)")
+                userInfo[tweetCreatedKey] = tweet
+                NSNotificationCenter.defaultCenter().postNotificationName(tweetCreatedNotification, object: self, userInfo: userInfo)
+                
             }
         }
         dismissViewControllerAnimated(true, completion: nil)

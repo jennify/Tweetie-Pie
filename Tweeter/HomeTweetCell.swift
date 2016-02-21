@@ -17,11 +17,13 @@ class HomeTweetCell: UITableViewCell {
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var timestampLabel: UILabel!
 
-    @IBOutlet weak var tweetTextLabel: UILabel!
+    @IBOutlet weak var tweetTextLabel: UITextView!
     @IBOutlet weak var profileImageView: UIImageView!
     
     @IBOutlet weak var favoriteButton: UIButton!
     @IBOutlet weak var retweetButton: UIButton!
+    @IBOutlet weak var tweetMediaImageView: UIImageView!
+    @IBOutlet weak var tweetMediaImageViewHeightConstraint: NSLayoutConstraint!
     
     var favorited: Bool! {
         didSet {
@@ -50,7 +52,24 @@ class HomeTweetCell: UITableViewCell {
             }
             timestampLabel.text = tweet.sinceCreatedString
             tweetTextLabel.text = tweet.text
+            
+            // Set profile image thumbnail
             profileImageView.setImageWithURL(NSURL(string: (tweet.user?.profileImageUrl)!)!)
+            profileImageView.layer.cornerRadius = 5
+            profileImageView.clipsToBounds = true
+            
+            // Set media image
+            if tweet.media_url != nil {
+                tweetMediaImageView.setImageWithURL(NSURL(string: tweet.media_url!)!)
+                tweetMediaImageView.layer.cornerRadius = 5
+                tweetMediaImageView.clipsToBounds = true
+                tweetMediaImageView.hidden = false
+//                tweetMediaImageViewHeightConstraint.constant = 231.0
+                
+            } else {
+                tweetMediaImageView.hidden = true
+//                tweetMediaImageViewHeightConstraint.constant = 0.0
+            }
             
             if tweet.retweetedBy != nil {
                 retweetLabel.text = "@" + (tweet.retweetedBy?.screenname)! + " retweeted"
@@ -59,7 +78,7 @@ class HomeTweetCell: UITableViewCell {
                 retweetLabel.text = "In reply to @" + (tweet.in_reply_to_screen_name)!
                 retweetLabel.hidden = false
             } else {
-                retweetLabel.hidden = true
+//                retweetLabel.hidden = true
             }
 
             // Set state variables.

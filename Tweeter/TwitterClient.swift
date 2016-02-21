@@ -54,7 +54,6 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
     
     func buildURLWithQueryParams(url: String, queryParams: [String:String]?) -> String {
         var urlWithQueryParams = url
-        print(queryParams)
         if queryParams != nil {
             urlWithQueryParams.appendContentsOf("?")
             for qp in queryParams! {
@@ -65,7 +64,6 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         if urlWithQueryParams[urlWithQueryParams.endIndex.predecessor()] == "&" {
             urlWithQueryParams = String(urlWithQueryParams.characters.dropLast())
         }
-        print(urlWithQueryParams)
 
         return urlWithQueryParams
     }
@@ -103,7 +101,8 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
     }
     
     func homeTimelineWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
-        GET("1.1/statuses/home_timeline.json", parameters: nil, success:  { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
+        
+        GET("1.1/statuses/home_timeline.json", parameters: ["include_entities": true], success:  { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
                 let tweets = Tweet.tweetsWithArray(response as! [NSDictionary])
                 completion(tweets: tweets, error: nil)
             }, failure: { (operation: AFHTTPRequestOperation?, error: NSError) -> Void in

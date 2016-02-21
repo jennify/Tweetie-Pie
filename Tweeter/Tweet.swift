@@ -25,6 +25,9 @@ class Tweet: NSObject {
     var retweet_count: Int?
     var favorite_count: Int?
     
+    var media_url: String?
+    var media_height: Int?
+    
     init(dictionary: NSDictionary) {
         var tweet_dictionary: NSDictionary = dictionary
         
@@ -34,7 +37,24 @@ class Tweet: NSObject {
             
         }
         self.dictionary = tweet_dictionary
-        
+        if tweet_dictionary["entities"] != nil {
+            
+            let entities_dict = tweet_dictionary["entities"] as! NSDictionary
+            if entities_dict["media"] != nil {
+                let medias = entities_dict["media"] as! NSArray
+                let media = medias[0] as! NSDictionary
+                let media_url = media["media_url"] as! String
+                self.media_url = media_url
+
+//                let sizes_dict = media["sizes"] as! NSDictionary
+//                let small_dict = sizes_dict["small"] as! NSDictionary
+//                let height = small_dict["h"]
+//                let width = small_dict["w"]
+//                print("h:\(height)w:\(width)")
+//                self.media_height = height as? Int
+            }
+            
+        }
         user = User(dictionary: tweet_dictionary["user"] as! NSDictionary)
         text = tweet_dictionary["text"] as? String
         createdAtString = tweet_dictionary["created_at"] as? String
@@ -46,11 +66,11 @@ class Tweet: NSObject {
         if id_str != nil {
             tweetID = Int(id_str!)
         }
+        
         self.in_reply_to_screen_name = tweet_dictionary["in_reply_to_screen_name"] as? String
         self.retweet_count = tweet_dictionary["retweet_count"] as? Int
-        self.favorite_count = tweet_dictionary["favourites_count"] as? Int
+        self.favorite_count = tweet_dictionary["favorite_count"] as? Int
 
-        
     }
     
     func favorite(completion: (tweet: Tweet?, error:NSError?) -> ()) {
@@ -80,8 +100,9 @@ class Tweet: NSObject {
     }
     
     class func publishTweet(text: String, in_reply_tweet_id: Int?, completion: (tweets: Tweet?, error:NSError?) -> ()) {
-        TwitterClient.sharedInstance.publishTweet(text,in_reply_tweet_id:in_reply_tweet_id, completion: completion)
-        
+        if text.characters.count > 0 {
+            TwitterClient.sharedInstance.publishTweet(text,in_reply_tweet_id:in_reply_tweet_id, completion: completion)
+        }
     }
     
     

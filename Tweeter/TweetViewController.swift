@@ -18,8 +18,41 @@ class TweetViewController: UIViewController {
     @IBOutlet weak var favoriteCountLabel: UILabel!
     @IBOutlet weak var retweetButton: UIButton!
     @IBOutlet weak var favoriteButton: UIButton!
-    var favorited: Bool?
-    var retweeted: Bool?
+    var retweetCount: Int! {
+        didSet {
+            retweetCountLabel.text = "\(retweetCount!)"
+        }
+    }
+    var favoriteCount: Int! {
+        didSet {
+            favoriteCountLabel.text = "\(favoriteCount!)"
+        }
+    }
+    
+    var favorited: Bool! {
+        didSet {
+            var imageName = "like-action"
+            if favorited == true {
+                imageName = "like-action-on-pressed-red"
+                favoriteCount = favoriteCount + 1
+            } else {
+                favoriteCount = favoriteCount - 1
+            }
+            self.favoriteButton.setImage(UIImage(named: imageName), forState: UIControlState.Normal)
+        }
+    }
+    var retweeted: Bool! {
+        didSet {
+            var imageName = "retweet-default"
+            if retweeted == true {
+                imageName = "retweet-pressed-green"
+                retweetCount = retweetCount + 1
+            } else {
+                retweetCount = retweetCount - 1
+            }
+            self.retweetButton.setImage(UIImage(named: imageName), forState: UIControlState.Normal)
+        }
+    }
     
     @IBOutlet weak var retweetCountLabel: UILabel!
     var tweet: Tweet!
@@ -32,21 +65,28 @@ class TweetViewController: UIViewController {
         if tweet.user?.screenname != nil {
             usernameLabel.text = "@" + (tweet.user?.screenname)!
         }
+        
+        
+        retweetCount = tweet.retweet_count
+        favoriteCount = tweet.favorite_count
         timestampLabel.text = tweet.sinceCreatedString
         tweetTextLabel.text = tweet.text
         profileImageView.setImageWithURL(NSURL(string: (tweet.user?.profileImageUrl)!)!)
+        profileImageView.layer.cornerRadius = 5
+        profileImageView.clipsToBounds = true
         
         if tweet.retweetedBy != nil {
-            retweetLabel.text = "@" + (tweet.retweetedBy?.screenname)! + " retweeted"
-//            retweetLabel.hidden = false
+            retweetLabel.text = "@" + tweet.retweetedBy!.screenname! + " retweeted"
+            retweetLabel.hidden = false
         } else if tweet.in_reply_to_screen_name != nil {
+            print(tweet.in_reply_to_screen_name)
             retweetLabel.text = "In reply to @" + (tweet.in_reply_to_screen_name)!
-//            retweetLabel.hidden = false
+            retweetLabel.hidden = false
         } else {
-//            retweetLabel.hidden = true
-//            retweetLabel.text = ""
+            retweetLabel.hidden = true
+            retweetLabel.text = ""
         }
-//
+
         // Set state variables.
         favorited = tweet.favorited
         retweeted = tweet.retweeted
@@ -55,8 +95,6 @@ class TweetViewController: UIViewController {
         favoriteButton.setImage(UIImage(named: "like-action-hover"), forState: UIControlState.Highlighted)
         retweetButton.setImage(UIImage(named: "retweet-hover"), forState: UIControlState.Highlighted)
     
-        retweetCountLabel.text = "\(tweet.retweet_count!)"
-        favoriteCountLabel.text = "\(tweet.favorite_count!)"
     }
 
     @IBAction func onRetweet(sender: AnyObject) {
@@ -89,7 +127,7 @@ class TweetViewController: UIViewController {
                 if error == nil {
                     self.favorited = true
                 } else {
-                    print("error")
+                    print(error)
                 }
             }
         } else {
@@ -98,11 +136,22 @@ class TweetViewController: UIViewController {
                 if error == nil {
                     self.favorited = false
                 } else {
-                    print("error")
+                    print(error)
                 }
             }
         }
     }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        let destViewController = segue.destinationViewController
+        
+        if segue.identifier == "replyDetailTweetSegue" || segue.identifier == "replyDetailBarTweetSegue" {
+            let navigationController = destViewController as? UINavigationController
+            let composerViewController = navigationController?.topViewController as? ComposeViewController
+            composerViewController?.inReplyToTweet = self.tweet
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

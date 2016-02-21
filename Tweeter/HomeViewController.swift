@@ -39,10 +39,19 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         insets.bottom += InfiniteScrollActivityView.defaultHeight;
         tableView.contentInset = insets
         
+        // Network request to get initial data.
         Tweet.homeTimelineWithParams(nil) {
             (tweets: [Tweet]?, error: NSError?) in
             self.tweets = tweets
             self.tableView.reloadData()
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserverForName(tweetCreatedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { (notification: NSNotification) -> Void in
+            let createdTweet = notification.userInfo?[tweetCreatedKey] as? Tweet
+            if createdTweet != nil {
+                self.tweets?.insert(createdTweet!, atIndex: 0)
+                self.tableView.reloadData()
+            }
         }
     }
     
@@ -78,7 +87,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.tweets = refreshed_tweets
                 self.tableView.reloadData()
             } else {
-                print("Network Error")
+                print(error)
             }
             refreshControl.endRefreshing()
         }
