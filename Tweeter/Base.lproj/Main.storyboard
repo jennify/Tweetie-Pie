@@ -287,6 +287,9 @@
                                     <constraint firstAttribute="width" constant="25" id="wro-CF-wST"/>
                                 </constraints>
                                 <state key="normal" image="reply-dark"/>
+                                <connections>
+                                    <segue destination="Efp-5R-ZNX" kind="modal" id="Rw0-j1-1jH"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jYs-S2-cml">
                                 <rect key="frame" x="147" y="302" width="25" height="25"/>
@@ -402,7 +405,11 @@
                                 <constraint firstItem="Jiq-tG-O36" firstAttribute="centerY" secondItem="41f-8w-pDP" secondAttribute="centerY" id="e1V-gI-e01"/>
                             </constraints>
                         </view>
-                        <barButtonItem key="rightBarButtonItem" title="Reply" id="gs0-vi-etn"/>
+                        <barButtonItem key="rightBarButtonItem" title="Reply" id="gs0-vi-etn">
+                            <connections>
+                                <segue destination="Efp-5R-ZNX" kind="modal" identifier="replyDetailBarTweetSegue" id="VzP-QO-8MJ"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="favoriteButton" destination="OMU-DJ-PqF" id="HCD-cf-OTR"/>
@@ -586,6 +593,6 @@
         <image name="retweet-default" width="75" height="72"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="hZD-AI-c6p"/>
+        <segue reference="VzP-QO-8MJ"/>
     </inferredMetricsTieBreakers>
 </document>

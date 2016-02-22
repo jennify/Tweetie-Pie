@@ -2,7 +2,7 @@
 Tweetie Pie is a basic twitter app to read and compose tweets from the [Twitter API](https://apps.twitter.com/).
 
 Time spent: **X** hours spent in total
-8 hrs
+16 hrs
 ## User Stories
 
 The following **required** functionality is completed:
@@ -34,14 +34,14 @@ The following **additional** features are implemented:
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
-1.
-2.
+1. Changing size of UIImageView on load time - Hidden views still abide by auto layout constraints. Currently, I add a reference to the constraint and change the constant. However, that currently throws noisy errors.
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
-
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+![Tweet Reply, like details view, tweet and come back](HW3-tweet,reply,like,retweet,details.gif)
+![Compose new tweet](HW3-compose.gif)
+![Signing in and logging out](HW3-signin.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 

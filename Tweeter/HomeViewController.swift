@@ -118,8 +118,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
                 loadingMoreView?.frame = frame
                 loadingMoreView!.startAnimating()
-
-                Tweet.loadMoreHomeTimelineWithLastTweet((self.tweets?[self.tweets!.count - 1])!) {
+                Tweet.loadMoreHomeTimelineWithLastTweet((self.tweets?.last)!) {
                     (tweets: [Tweet]?, error: NSError?) in
                     if tweets != nil {
                         self.tweets?.appendContentsOf(tweets!)
