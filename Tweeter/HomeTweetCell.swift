@@ -78,7 +78,7 @@ class HomeTweetCell: UITableViewCell {
                 retweetLabel.text = "In reply to @" + (tweet.in_reply_to_screen_name)!
                 retweetLabel.hidden = false
             } else {
-//                retweetLabel.hidden = true
+                retweetLabel.hidden = true
             }
 
             // Set state variables.

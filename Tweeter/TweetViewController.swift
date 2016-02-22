@@ -12,8 +12,8 @@ class TweetViewController: UIViewController {
     @IBOutlet weak var retweetLabel: UILabel!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
+    @IBOutlet weak var tweetTextLabel: UITextView!
     @IBOutlet weak var profileImageView: UIImageView!
-    @IBOutlet weak var tweetTextLabel: UILabel!
     @IBOutlet weak var timestampLabel: UILabel!
     @IBOutlet weak var favoriteCountLabel: UILabel!
     @IBOutlet weak var retweetButton: UIButton!
@@ -65,7 +65,7 @@ class TweetViewController: UIViewController {
         if tweet.user?.screenname != nil {
             usernameLabel.text = "@" + (tweet.user?.screenname)!
         }
-        
+
         
         retweetCount = tweet.retweet_count
         favoriteCount = tweet.favorite_count
@@ -74,7 +74,7 @@ class TweetViewController: UIViewController {
         profileImageView.setImageWithURL(NSURL(string: (tweet.user?.profileImageUrl)!)!)
         profileImageView.layer.cornerRadius = 5
         profileImageView.clipsToBounds = true
-        
+//
         if tweet.retweetedBy != nil {
             retweetLabel.text = "@" + tweet.retweetedBy!.screenname! + " retweeted"
             retweetLabel.hidden = false
