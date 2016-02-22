@@ -1,8 +1,8 @@
 # Project 3 - Tweetie Pie
 Tweetie Pie is a basic twitter app to read and compose tweets from the [Twitter API](https://apps.twitter.com/).
 
-Time spent: **X** hours spent in total
-16 hrs
+Time spent: 17 hours spent in total
+
 ## User Stories
 
 The following **required** functionality is completed:
@@ -39,6 +39,7 @@ Please list two areas of the assignment you'd like to **discuss further with you
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
+
 ![Tweet Reply, like details view, tweet and come back](HW3-tweet,reply,like,retweet,details.gif)
 ![Compose new tweet](HW3-compose.gif)
 ![Signing in and logging out](HW3-signin.gif)
