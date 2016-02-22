@@ -94,8 +94,9 @@ class Tweet: NSObject {
     }
     
     class func loadMoreHomeTimelineWithLastTweet(lastTweet: Tweet, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
+        print(lastTweet.tweetID)
 
-        let params: NSDictionary = ["since_id": (lastTweet.tweetID)!]
+        let params: NSDictionary = ["max_id": (lastTweet.tweetID)!]
         TwitterClient.sharedInstance.homeTimelineWithParams(params , completion:  completion)
     }
     
