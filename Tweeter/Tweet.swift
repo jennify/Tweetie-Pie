@@ -9,7 +9,8 @@
 //import Cocoa
 import UIKit
 
-
+var _currentTweets: [Tweet]?
+var currentTweetKey = "kCurrentTweetsKey"
 class Tweet: NSObject {
     var user: User?
     var text: String?
@@ -105,7 +106,16 @@ class Tweet: NSObject {
             TwitterClient.sharedInstance.publishTweet(text,in_reply_tweet_id:in_reply_tweet_id, completion: completion)
         }
     }
+
     
+    class func arrayWithTweets(tweets: [Tweet]) -> [NSDictionary]{
+        var dataArray = [NSDictionary]()
+        
+        for tweet in tweets {
+            dataArray.append(tweet.dictionary!)
+        }
+        return dataArray
+    }
     
     class func tweetsWithArray(array: [NSDictionary]) -> [Tweet] {
         var tweets = [Tweet]()
@@ -116,4 +126,43 @@ class Tweet: NSObject {
         
         return tweets
     }
+    
+    class var currentTweets: [Tweet]? {
+        get {
+            if _currentTweets == nil {
+                let data = NSUserDefaults.standardUserDefaults().objectForKey(currentTweetKey) as? NSData
+                if data != nil {
+                do {
+                    if let tweetData = try NSJSONSerialization.JSONObjectWithData(data!,
+                    options:NSJSONReadingOptions(rawValue:0)) as? [NSDictionary] {
+                         _currentTweets = Tweet.tweetsWithArray(tweetData)
+                    }
+                } catch {
+                _currentTweets = nil
+                }
+                }
+            }
+            return _currentTweets
+        }
+        
+        set(tweets){
+            _currentTweets = tweets
+            if _currentTweets != nil {
+                do {
+                    let tweetData = arrayWithTweets(tweets!)
+                    let data = try NSJSONSerialization.dataWithJSONObject(tweetData,
+                        options:NSJSONWritingOptions(rawValue: 0))
+                    NSUserDefaults.standardUserDefaults().setObject(data, forKey: currentTweetKey)
+                    
+                } catch {
+                    print("Serialization Failed")
+                }
+            } else {
+                NSUserDefaults.standardUserDefaults().setObject(nil, forKey: currentTweetKey)
+            }
+            NSUserDefaults.standardUserDefaults().synchronize()
+            
+        }
+    }
+    
 }

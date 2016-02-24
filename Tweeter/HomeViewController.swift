@@ -40,12 +40,20 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.contentInset = insets
         
         // Network request to get initial data.
-        Tweet.homeTimelineWithParams(nil) {
-            (tweets: [Tweet]?, error: NSError?) in
-            self.tweets = tweets
-            self.tableView.reloadData()
+        if Tweet.currentTweets == nil {
+            Tweet.homeTimelineWithParams(nil) {
+                (tweets: [Tweet]?, error: NSError?) in
+                self.tweets = tweets
+                Tweet.currentTweets = tweets
+                print("Caching")
+                self.tableView.reloadData()
+            }
+
+        } else {
+            self.tweets = Tweet.currentTweets
+            print("Loading cached")
         }
-        
+            
         NSNotificationCenter.defaultCenter().addObserverForName(tweetCreatedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { (notification: NSNotification) -> Void in
             let createdTweet = notification.userInfo?[tweetCreatedKey] as? Tweet
             if createdTweet != nil {
