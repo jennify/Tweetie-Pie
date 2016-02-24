@@ -21,8 +21,14 @@ class LoginViewController: UIViewController {
         User.loginWithCompletion() {
             (user: User?, error: NSError?) in
             if user != nil {
-                self.performSegueWithIdentifier("loginSegue", sender: self)
-                print("Perform segue")
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let hamburgerViewController = storyboard.instantiateViewControllerWithIdentifier("HamburgerViewController") as! HamburgerViewController
+                let menuViewController = storyboard.instantiateViewControllerWithIdentifier("MenuViewController") as! MenuViewController
+                
+                menuViewController.hamburgerViewController = hamburgerViewController
+                hamburgerViewController.menuViewController = menuViewController
+                self.presentViewController(hamburgerViewController, animated: true, completion: nil)
+                
             } else {
                 print(error)
             }

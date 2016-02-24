@@ -8,7 +8,7 @@
 
 import UIKit
 
-
+let kHamburgerPressed = "kHamburgerPressed"
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, HomeTweetCellDelegate {
     var tweets: [Tweet]?
     var isMoreDataLoading = false
@@ -63,10 +63,13 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
     
+    @IBAction func onHamburger(sender: AnyObject) {
+        NSNotificationCenter.defaultCenter().postNotificationName(kHamburgerPressed, object: nil)
+    }
+    
     @IBAction func onLogout(sender: AnyObject) {
         User.currentUser?.logout()
     }
-    
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
         let destViewController = segue.destinationViewController

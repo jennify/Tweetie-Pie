@@ -58,7 +58,7 @@ class UserProfileViewController: UIViewController {
         super.viewDidLoad()
         if user != nil {
             nameLabel.text = user?.name
-            usernameLabel.text = user?.screenname
+            usernameLabel.text = "@\(user!.screenname!)"
             profileImageView.setImageWithURL(NSURL(string: user!.profileImageUrl!)!)
             followersCount = user!.followers_count!
             followingCountLabel.text = "\(user!.following_count!)"
