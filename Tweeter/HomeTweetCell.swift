@@ -9,6 +9,9 @@
 import UIKit
 import AFNetworking
 
+@objc protocol HomeTweetCellDelegate {
+    optional func performSegueToIdentifier(identifier: String, sender: HomeTweetCell)
+}
 
 class HomeTweetCell: UITableViewCell {
     
@@ -25,6 +28,9 @@ class HomeTweetCell: UITableViewCell {
     @IBOutlet weak var tweetMediaImageView: UIImageView!
     
     @IBOutlet weak var tweetMediaImageViewConstraint: NSLayoutConstraint!
+    
+    var delegate: HomeTweetCellDelegate?
+    
     var favorited: Bool! {
         didSet {
             var imageName = "like-action"
@@ -57,6 +63,11 @@ class HomeTweetCell: UITableViewCell {
             profileImageView.setImageWithURL(NSURL(string: (tweet.user?.profileImageUrl)!)!)
             profileImageView.layer.cornerRadius = 5
             profileImageView.clipsToBounds = true
+            
+            // Set up gestures to UIImageView
+            let tapGesture = UITapGestureRecognizer(target: self, action: "profileImageTapped:")
+            profileImageView.addGestureRecognizer(tapGesture)
+            profileImageView.userInteractionEnabled = true
             
             // Set media image
             if tweet.media_url != nil {
@@ -91,6 +102,16 @@ class HomeTweetCell: UITableViewCell {
             
         }
     }
+    
+    func profileImageTapped(gesture: UIGestureRecognizer) {
+        if let _ = gesture.view as? UIImageView {
+            // Go to profile view after tapping on user image.
+            if self.delegate != nil {
+                self.delegate!.performSegueToIdentifier?("userProfileFromHomeSegue", sender: self)
+            }
+        }
+    }
+
 
     @IBAction func onReply(sender: AnyObject) {
         

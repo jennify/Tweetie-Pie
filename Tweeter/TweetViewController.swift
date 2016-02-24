@@ -18,6 +18,8 @@ class TweetViewController: UIViewController {
     @IBOutlet weak var favoriteCountLabel: UILabel!
     @IBOutlet weak var retweetButton: UIButton!
     @IBOutlet weak var favoriteButton: UIButton!
+    var user: User?
+    
     var retweetCount: Int! {
         didSet {
             retweetCountLabel.text = "\(retweetCount!)"
@@ -74,7 +76,12 @@ class TweetViewController: UIViewController {
         profileImageView.setImageWithURL(NSURL(string: (tweet.user?.profileImageUrl)!)!)
         profileImageView.layer.cornerRadius = 5
         profileImageView.clipsToBounds = true
-//
+
+        // Set up gestures to UIImageView
+        let tapGesture = UITapGestureRecognizer(target: self, action: "profileImageTapped:")
+        profileImageView.addGestureRecognizer(tapGesture)
+        profileImageView.userInteractionEnabled = true
+        
         if tweet.retweetedBy != nil {
             retweetLabel.text = "@" + tweet.retweetedBy!.screenname! + " retweeted"
             retweetLabel.hidden = false
@@ -86,7 +93,8 @@ class TweetViewController: UIViewController {
             retweetLabel.hidden = true
             retweetLabel.text = ""
         }
-
+        user = tweet.user
+        
         // Set state variables.
         favorited = tweet.favorited
         retweeted = tweet.retweeted
@@ -97,6 +105,12 @@ class TweetViewController: UIViewController {
     
     }
 
+    func profileImageTapped(gesture: UIGestureRecognizer) {
+        if let _ = gesture.view as? UIImageView {
+            self.performSegueWithIdentifier("userProfileFromDetailsSegue", sender: self)
+        }
+    }
+    
     @IBAction func onRetweet(sender: AnyObject) {
         if self.retweeted == false {
             tweet.retweet() {
@@ -149,6 +163,11 @@ class TweetViewController: UIViewController {
             let navigationController = destViewController as? UINavigationController
             let composerViewController = navigationController?.topViewController as? ComposeViewController
             composerViewController?.inReplyToTweet = self.tweet
+        } else if segue.identifier == "userProfileFromDetailsSegue" {
+            let vc = sender as? TweetViewController
+            let profileViewController = destViewController as? UserProfileViewController
+            profileViewController?.user = vc?.user
+            
         }
     }
     

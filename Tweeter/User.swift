@@ -19,6 +19,11 @@ class User: NSObject {
     var profileImageUrl: String?
     var tagline: String?
     var dictionary: NSDictionary!
+    var following: Bool?
+    var followers_count: Int?
+    var following_count: Int?
+    var tweet_count: Int?
+    var recent_tweet: Tweet?
     
     init(dictionary: NSDictionary) {
         self.dictionary = dictionary
@@ -26,6 +31,10 @@ class User: NSObject {
         screenname = dictionary["screen_name"] as? String
         profileImageUrl = dictionary["profile_image_url"] as? String
         tagline = dictionary["description"] as? String
+        following = dictionary["following"] as? Bool
+        followers_count = dictionary["followers_count"] as? Int
+        following_count = dictionary["friends_count"] as? Int
+        tweet_count = dictionary["statuses_count"] as? Int
     }
     
     func logout() {
@@ -37,6 +46,14 @@ class User: NSObject {
     
     class func loginWithCompletion(completion: (user: User?, error: NSError?) -> ()) {
         TwitterClient.sharedInstance.loginWithCompletion(completion)
+    }
+    
+    func follow(completion: (User?, NSError?) -> Void) {
+        TwitterClient.sharedInstance.follow(screenname!, completion: completion)
+    }
+    
+    func unfollow(completion: (User?, NSError?) -> Void) {
+        TwitterClient.sharedInstance.unfollow(screenname!, completion: completion)
     }
     
     class var currentUser: User? {

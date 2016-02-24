@@ -9,7 +9,7 @@
 import UIKit
 
 
-class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
+class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, HomeTweetCellDelegate {
     var tweets: [Tweet]?
     var isMoreDataLoading = false
     @IBOutlet weak var tableView: UITableView!
@@ -85,6 +85,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             let detailsViewController = destViewController as? TweetViewController
             detailsViewController?.tweet = cell?.tweet
             
+        } else if segue.identifier == "userProfileFromHomeSegue" {
+            let cell = sender as? HomeTweetCell
+            let profileViewController = destViewController as? UserProfileViewController
+            profileViewController?.user = cell?.tweet.user
+            
         }
     }
     
@@ -103,13 +108,17 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("HomeTweetCell", forIndexPath: indexPath) as! HomeTweetCell
+        cell.delegate = self
         cell.tweet = self.tweets![indexPath.row]
-        
         return cell
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.tweets?.count ?? 0
+    }
+    
+    func performSegueToIdentifier(identifier: String, sender: HomeTweetCell) {
+        self.performSegueWithIdentifier(identifier, sender: sender)
     }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {

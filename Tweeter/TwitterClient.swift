@@ -32,6 +32,18 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         return Static.instance
     }
     
+    func follow(username: String, completion: (user: User?, error: NSError?) -> ()) {
+        let url = "https://api.twitter.com/1.1/friendships/create.json"
+        let queryParams = ["screen_name": username]
+        requestTwitterWithUserResponse(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: nil, completion: completion)
+    }
+    
+    func unfollow(username: String, completion: (user: User?, error: NSError?) -> ()) {
+        let url = "https://api.twitter.com/1.1/friendships/destroy.json"
+        let queryParams = ["screen_name": username]
+        requestTwitterWithUserResponse(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: nil, completion: completion)
+    }
+    
     func retweet(id: String, completion: (tweet: Tweet?, error: NSError?) -> ()) {
         let url = "1.1/statuses/retweet/\(id).json"
         requestTwitterWithTweetResponse(NetworkRequest.POST, url: url, queryParams: nil, parameters: nil, completion: completion)
@@ -97,6 +109,17 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
                 tweet = Tweet(dictionary: response as! NSDictionary)
             }
             completion(tweet:tweet, error: error)
+        }
+    }
+    
+    func requestTwitterWithUserResponse(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (user: User?, error: NSError?) -> ()) {
+        requestTwitter(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: parameters) {
+            (response: AnyObject?, error: NSError?) in
+            var user: User? = nil
+            if response != nil {
+                user = User(dictionary: response as! NSDictionary)
+            }
+            completion(user:user, error: error)
         }
     }
     
