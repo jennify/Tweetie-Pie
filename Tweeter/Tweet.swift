@@ -18,7 +18,7 @@ class Tweet: NSObject {
     var sinceCreatedString: String?
     var createAt: NSDate?
     var retweetedBy: User?
-    var tweetID: Int?
+    var tweetID: UInt64?
     var retweeted: Bool?
     var favorited: Bool?
     var in_reply_to_screen_name: String?
@@ -64,9 +64,10 @@ class Tweet: NSObject {
         retweeted = tweet_dictionary["retweeted"] as? Bool
         favorited = tweet_dictionary["favorited"] as? Bool
         let id_str = tweet_dictionary["id_str"] as? String
-        if id_str != nil {
-            tweetID = Int(id_str!)
-        }
+        print(id_str)
+        print(UInt64(id_str!))
+        tweetID = UInt64(id_str!)
+        print(tweetID)
         
         self.in_reply_to_screen_name = tweet_dictionary["in_reply_to_screen_name"] as? String
         self.retweet_count = tweet_dictionary["retweet_count"] as? Int
@@ -94,14 +95,24 @@ class Tweet: NSObject {
         TwitterClient.sharedInstance.homeTimelineWithParams(nil , completion:  completion)
     }
     
+    class func mentionsWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
+        TwitterClient.sharedInstance.mentionsWithParams(nil , completion:  completion)
+    }
+    
     class func loadMoreHomeTimelineWithLastTweet(lastTweet: Tweet, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
-        print(lastTweet.tweetID)
-
-        let params: NSDictionary = ["max_id": (lastTweet.tweetID)!]
+        print(lastTweet)
+        let max_id = NSNumber(unsignedLongLong: lastTweet.tweetID!)
+        let params: NSDictionary = ["max_id": max_id]
         TwitterClient.sharedInstance.homeTimelineWithParams(params , completion:  completion)
     }
     
-    class func publishTweet(text: String, in_reply_tweet_id: Int?, completion: (tweets: Tweet?, error:NSError?) -> ()) {
+    class func loadMoreMentionsWithLastTweet(lastTweet: Tweet, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
+        let max_id = NSNumber(unsignedLongLong: lastTweet.tweetID!)
+        let params: NSDictionary = ["max_id": max_id]
+        TwitterClient.sharedInstance.mentionsWithParams(params , completion:  completion)
+    }
+    
+    class func publishTweet(text: String, in_reply_tweet_id: UInt64?, completion: (tweets: Tweet?, error:NSError?) -> ()) {
         if text.characters.count > 0 {
             TwitterClient.sharedInstance.publishTweet(text,in_reply_tweet_id:in_reply_tweet_id, completion: completion)
         }

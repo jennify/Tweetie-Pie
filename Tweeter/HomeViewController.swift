@@ -9,51 +9,43 @@
 import UIKit
 
 let kHamburgerPressed = "kHamburgerPressed"
-class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, HomeTweetCellDelegate {
+enum HomeViewControllerStyle {
+    case MENTIONS, HOME
+}
+class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, HomeTweetCellDelegate {
     var tweets: [Tweet]?
-    var isMoreDataLoading = false
     @IBOutlet weak var tableView: UITableView!
-    var loadingMoreView:InfiniteScrollActivityView?
-    
+    var isMoreDataLoading = false
+    var loadingMoreView: InfiniteScrollActivityView?
+    var style: HomeViewControllerStyle!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
+        // Set up table view
         tableView.delegate = self
         tableView.dataSource = self
         tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
         
-        // Initialize a UIRefreshControl
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
-        tableView.insertSubview(refreshControl, atIndex: 0)
+        self.refreshControlInit()
+        self.scrollViewInit()
         
-        // Set up Infinite Scroll loading indicator
-        let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
-        loadingMoreView = InfiniteScrollActivityView(frame: frame)
-        loadingMoreView!.hidden = true
-        tableView.addSubview(loadingMoreView!)
-        
-        var insets = tableView.contentInset;
-        insets.bottom += InfiniteScrollActivityView.defaultHeight;
-        tableView.contentInset = insets
-        
-        // Network request to get initial data.
+        // Network request to get initial data + Caching.
         if Tweet.currentTweets == nil {
-            Tweet.homeTimelineWithParams(nil) {
+            getHomeTimelineWithCompletion {
                 (tweets: [Tweet]?, error: NSError?) in
                 self.tweets = tweets
                 Tweet.currentTweets = tweets
                 print("Caching")
                 self.tableView.reloadData()
             }
-
         } else {
             self.tweets = Tweet.currentTweets
             print("Loading cached")
         }
-            
+        
+        // Add observer for any new tweets created by current user.
         NSNotificationCenter.defaultCenter().addObserverForName(tweetCreatedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { (notification: NSNotification) -> Void in
             let createdTweet = notification.userInfo?[tweetCreatedKey] as? Tweet
             if createdTweet != nil {
@@ -95,17 +87,12 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             
         }
     }
-    
-    func refreshControlAction(refreshControl: UIRefreshControl) {
-        Tweet.homeTimelineWithParams(nil) {
-            (refreshed_tweets: [Tweet]?, error: NSError?) in
-            if refreshed_tweets != nil {
-                self.tweets = refreshed_tweets
-                self.tableView.reloadData()
-            } else {
-                print(error)
-            }
-            refreshControl.endRefreshing()
+
+    func getHomeTimelineWithCompletion(completion: ([Tweet]?,NSError?) -> Void) {
+        if self.style == HomeViewControllerStyle.HOME {
+            Tweet.homeTimelineWithParams(nil, completion: completion)
+        } else if self.style == HomeViewControllerStyle.MENTIONS {
+            Tweet.mentionsWithParams(nil, completion: completion)
         }
     }
     
@@ -123,6 +110,49 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     func performSegueToIdentifier(identifier: String, sender: HomeTweetCell) {
         self.performSegueWithIdentifier(identifier, sender: sender)
     }
+
+}
+
+extension HomeViewController {
+    // Extension for refresh.
+    
+    func refreshControlInit() {
+        // Initialize a UIRefreshControl
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
+        tableView.insertSubview(refreshControl, atIndex: 0)
+        
+    }
+    
+    func refreshControlAction(refreshControl: UIRefreshControl) {
+        getHomeTimelineWithCompletion() {
+            (refreshed_tweets: [Tweet]?, error: NSError?) in
+            if refreshed_tweets != nil {
+                self.tweets = refreshed_tweets
+                self.tableView.reloadData()
+            } else {
+                print(error)
+            }
+            refreshControl.endRefreshing()
+        }
+    }
+}
+
+extension HomeViewController: UIScrollViewDelegate {
+    // Extension for Infinite scroll.
+    
+    func scrollViewInit() {
+        // Set up Infinite Scroll loading indicator
+        let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
+        loadingMoreView = InfiniteScrollActivityView(frame: frame)
+        loadingMoreView!.hidden = true
+        tableView.addSubview(loadingMoreView!)
+        
+        var insets = tableView.contentInset;
+        insets.bottom += InfiniteScrollActivityView.defaultHeight;
+        tableView.contentInset = insets
+
+    }
     
     func scrollViewDidScroll(scrollView: UIScrollView) {
         if (!isMoreDataLoading) {
@@ -133,23 +163,38 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             // When the user has scrolled past the threshold, start requesting
             if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.dragging) {
                 isMoreDataLoading = true
-
+                
                 // Update position of loadingMoreView, and start loading indicator
                 let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
                 loadingMoreView?.frame = frame
                 loadingMoreView!.startAnimating()
-                Tweet.loadMoreHomeTimelineWithLastTweet((self.tweets?.last)!) {
-                    (tweets: [Tweet]?, error: NSError?) in
-                    if tweets != nil {
-                        self.tweets?.appendContentsOf(tweets!)
-                        self.loadingMoreView!.stopAnimating()
-                        self.tableView.reloadData()
-                        self.isMoreDataLoading = false
-                    } else {
-                        print("\(error)")
+                if self.style == HomeViewControllerStyle.HOME {
+                    Tweet.loadMoreHomeTimelineWithLastTweet((self.tweets?.last)!) {
+                        (tweets: [Tweet]?, error: NSError?) in
+                        if tweets != nil {
+                            self.tweets?.appendContentsOf(tweets!)
+                            self.loadingMoreView!.stopAnimating()
+                            self.tableView.reloadData()
+                            self.isMoreDataLoading = false
+                        } else {
+                            print("\(error)")
+                        }
+                    }
+                } else if self.style == HomeViewControllerStyle.MENTIONS {
+                    Tweet.loadMoreMentionsWithLastTweet((self.tweets?.last)!) {
+                        (tweets: [Tweet]?, error: NSError?) in
+                        if tweets != nil {
+                            self.tweets?.appendContentsOf(tweets!)
+                            self.loadingMoreView!.stopAnimating()
+                            self.tableView.reloadData()
+                            self.isMoreDataLoading = false
+                        } else {
+                            print("\(error)")
+                        }
                     }
                 }
             }
         }
     }
+
 }

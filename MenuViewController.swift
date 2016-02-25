@@ -24,17 +24,23 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.rowHeight = UITableViewAutomaticDimension
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         
-        let homeVC = storyboard.instantiateViewControllerWithIdentifier("HomeNavigationController")
+        let homeNavC = storyboard.instantiateViewControllerWithIdentifier("HomeNavigationController") as! UINavigationController
+        let homeVC = homeNavC.topViewController as! HomeViewController
+        homeVC.style = HomeViewControllerStyle.HOME
+        
         let profileVC = storyboard.instantiateViewControllerWithIdentifier("UserProfileViewController") as! UserProfileViewController
         profileVC.user = User.currentUser
-        let mentionsVC = storyboard.instantiateViewControllerWithIdentifier("HomeNavigationController")
         
-        viewControllers.append(homeVC)
+        let mentionsNavC = storyboard.instantiateViewControllerWithIdentifier("HomeNavigationController") as! UINavigationController
+        let mentionsVC = mentionsNavC.topViewController as! HomeViewController
+        mentionsVC.style = HomeViewControllerStyle.MENTIONS
+        
+        viewControllers.append(homeNavC)
         menuTitle.append("Home")
         viewControllers.append(profileVC)
         menuTitle.append("My Profile")
-        viewControllers.append(mentionsVC)
-        menuTitle.append("Mentions (Home)")
+        viewControllers.append(mentionsNavC)
+        menuTitle.append("Mentions")
         
         menuTitle.append("Log out")
         

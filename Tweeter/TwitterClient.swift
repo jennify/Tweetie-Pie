@@ -112,6 +112,14 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         }
     }
     
+    func requestTwitterWithTweetArrayResponse(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
+        requestTwitter(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: parameters) {
+            (response: AnyObject?, error: NSError?) in
+            let tweets = Tweet.tweetsWithArray(response as! [NSDictionary])
+            completion(tweets:tweets, error: error)
+        }
+    }
+    
     func requestTwitterWithUserResponse(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (user: User?, error: NSError?) -> ()) {
         requestTwitter(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: parameters) {
             (response: AnyObject?, error: NSError?) in
@@ -125,7 +133,8 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
     
     func homeTimelineWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
         
-        GET("1.1/statuses/home_timeline.json", parameters: ["include_entities": true], success:  { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
+//        new_params["include_entities"] = "true"
+        GET("1.1/statuses/home_timeline.json", parameters: parameters, success:  { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
                 let tweets = Tweet.tweetsWithArray(response as! [NSDictionary])
                 completion(tweets: tweets, error: nil)
             }, failure: { (operation: AFHTTPRequestOperation?, error: NSError) -> Void in
@@ -133,7 +142,15 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         })
     }
     
-    func publishTweet(text: String, in_reply_tweet_id: Int?, completion: (tweet: Tweet?, error: NSError?) -> ()) {
+    func mentionsWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
+        let url = "https://api.twitter.com/1.1/statuses/mentions_timeline.json"
+//        var new_params = parameters
+//        new_params["include_entities"] = true
+        requestTwitterWithTweetArrayResponse(NetworkRequest.POST, url: url, queryParams: nil, parameters: parameters, completion: completion)
+
+    }
+    
+    func publishTweet(text: String, in_reply_tweet_id: UInt64?, completion: (tweet: Tweet?, error: NSError?) -> ()) {
         let url = "1.1/statuses/update.json"
         var queryParams = ["status": text]
         if in_reply_tweet_id != nil {
@@ -142,6 +159,7 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         
         requestTwitterWithTweetResponse(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: nil, completion: completion)
     }
+    
     
     func loginWithCompletion(completion: (user: User?, error: NSError?) -> ()) {
         self.loginCompletion = completion
