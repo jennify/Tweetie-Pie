@@ -24,6 +24,8 @@ class User: NSObject {
     var following_count: Int?
     var tweet_count: Int?
     var recent_tweet: Tweet?
+    var bannerImageUrl: String?
+//    var profileBackgroundImageColor: String?
     
     init(dictionary: NSDictionary) {
         self.dictionary = dictionary
@@ -35,7 +37,13 @@ class User: NSObject {
         followers_count = dictionary["followers_count"] as? Int
         following_count = dictionary["friends_count"] as? Int
         tweet_count = dictionary["statuses_count"] as? Int
+        
+//        profileBackgroundImageColor = dictionary["profile_background_color"] as? String
+//        backgroundImageUrl = dictionary["profile_background_image_url"] as? String
+
+        bannerImageUrl = dictionary["profile_banner_url"] as? String
     }
+    
     
     func logout() {
         User.currentUser = nil

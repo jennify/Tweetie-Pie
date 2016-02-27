@@ -17,11 +17,11 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewDidLoad() {
 
         super.viewDidLoad()
-        print("Menu View Controller: VIew did load")
         tableView.delegate = self
         tableView.dataSource = self
         tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.backgroundColor = UIColor(red:0.882, green:0.91, blue:0.929, alpha:1)
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         
         let homeNavC = storyboard.instantiateViewControllerWithIdentifier("HomeNavigationController") as! UINavigationController
@@ -46,6 +46,11 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         hamburgerViewController?.contentViewController = viewControllers[0]
         
+    }
+    
+    func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footerView: UIView! = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
+        return footerView
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {

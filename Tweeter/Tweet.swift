@@ -10,7 +10,9 @@
 import UIKit
 
 var _currentTweets: [Tweet]?
+var _mentionTweets: [Tweet]?
 var currentTweetKey = "kCurrentTweetsKey"
+
 class Tweet: NSObject {
     var user: User?
     var text: String?
@@ -46,13 +48,6 @@ class Tweet: NSObject {
                 let media = medias[0] as! NSDictionary
                 let media_url = media["media_url"] as! String
                 self.media_url = media_url
-
-//                let sizes_dict = media["sizes"] as! NSDictionary
-//                let small_dict = sizes_dict["small"] as! NSDictionary
-//                let height = small_dict["h"]
-//                let width = small_dict["w"]
-//                print("h:\(height)w:\(width)")
-//                self.media_height = height as? Int
             }
             
         }
@@ -64,10 +59,7 @@ class Tweet: NSObject {
         retweeted = tweet_dictionary["retweeted"] as? Bool
         favorited = tweet_dictionary["favorited"] as? Bool
         let id_str = tweet_dictionary["id_str"] as? String
-        print(id_str)
-        print(UInt64(id_str!))
         tweetID = UInt64(id_str!)
-        print(tweetID)
         
         self.in_reply_to_screen_name = tweet_dictionary["in_reply_to_screen_name"] as? String
         self.retweet_count = tweet_dictionary["retweet_count"] as? Int
@@ -100,7 +92,6 @@ class Tweet: NSObject {
     }
     
     class func loadMoreHomeTimelineWithLastTweet(lastTweet: Tweet, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
-        print(lastTweet)
         let max_id = NSNumber(unsignedLongLong: lastTweet.tweetID!)
         let params: NSDictionary = ["max_id": max_id]
         TwitterClient.sharedInstance.homeTimelineWithParams(params , completion:  completion)

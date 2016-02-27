@@ -86,7 +86,6 @@ class TweetViewController: UIViewController {
             retweetLabel.text = "@" + tweet.retweetedBy!.screenname! + " retweeted"
             retweetLabel.hidden = false
         } else if tweet.in_reply_to_screen_name != nil {
-            print(tweet.in_reply_to_screen_name)
             retweetLabel.text = "In reply to @" + (tweet.in_reply_to_screen_name)!
             retweetLabel.hidden = false
         } else {

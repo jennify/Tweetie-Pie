@@ -19,6 +19,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     var loadingMoreView: InfiniteScrollActivityView?
     var style: HomeViewControllerStyle!
 
+    var hideFooterView: Bool = true
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -30,19 +32,15 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         self.refreshControlInit()
         self.scrollViewInit()
+//        Tweet.currentTweets = nil
         
         // Network request to get initial data + Caching.
-        if Tweet.currentTweets == nil {
-            getHomeTimelineWithCompletion {
-                (tweets: [Tweet]?, error: NSError?) in
-                self.tweets = tweets
-                Tweet.currentTweets = tweets
-                print("Caching")
-                self.tableView.reloadData()
-            }
-        } else {
-            self.tweets = Tweet.currentTweets
-            print("Loading cached")
+        getHomeTimelineWithCompletion {
+            (tweets: [Tweet]?, error: NSError?) in
+            self.tweets = tweets
+            Tweet.currentTweets = tweets
+            self.hideFooterView = tweets?.count > 0
+            self.tableView.reloadData()
         }
         
         // Add observer for any new tweets created by current user.
@@ -61,6 +59,24 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @IBAction func onLogout(sender: AnyObject) {
         User.currentUser?.logout()
+    }
+    
+    func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footerView: UIView! = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.width))
+        
+        let sorryImageView: UIImageView = UIImageView(image: UIImage(named: "sad-face"))
+        sorryImageView.center = footerView.center
+        footerView.addSubview(sorryImageView)
+        
+        let sorryLabel = UILabel()
+        sorryLabel.text = "No tweets to show."
+        sorryLabel.textColor = UIColor.lightGrayColor()
+        sorryLabel.sizeToFit()
+        sorryLabel.center = CGPoint(x: footerView.center.x, y: footerView.center.y + 100 )
+        footerView.addSubview(sorryLabel)
+        
+        footerView.hidden = self.hideFooterView
+        return footerView
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
@@ -89,10 +105,29 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func getHomeTimelineWithCompletion(completion: ([Tweet]?,NSError?) -> Void) {
+        
+        if Tweet.currentTweets == nil {
+            if self.style == HomeViewControllerStyle.HOME {
+                Tweet.homeTimelineWithParams(nil, completion: completion)
+            } else if self.style == HomeViewControllerStyle.MENTIONS {
+                Tweet.mentionsWithParams(nil, completion: completion)
+            }
+        } else {
+            self.tweets = Tweet.currentTweets
+            self.hideFooterView = tweets?.count > 0
+            completion(self.tweets, nil)
+            self.tableView.reloadData()
+            print("Loading cached")
+        }
+        
+    }
+    
+    func loadMoreTimelineWithCompletion(completion: ([Tweet]?,NSError?) -> Void) {
+        let lastTweet = self.tweets?.last
         if self.style == HomeViewControllerStyle.HOME {
-            Tweet.homeTimelineWithParams(nil, completion: completion)
+            Tweet.loadMoreHomeTimelineWithLastTweet(lastTweet!, completion: completion)
         } else if self.style == HomeViewControllerStyle.MENTIONS {
-            Tweet.mentionsWithParams(nil, completion: completion)
+            Tweet.loadMoreMentionsWithLastTweet(lastTweet!, completion: completion)
         }
     }
     
@@ -129,6 +164,8 @@ extension HomeViewController {
             (refreshed_tweets: [Tweet]?, error: NSError?) in
             if refreshed_tweets != nil {
                 self.tweets = refreshed_tweets
+                Tweet.currentTweets = refreshed_tweets
+                self.hideFooterView = refreshed_tweets?.count > 0
                 self.tableView.reloadData()
             } else {
                 print(error)
@@ -168,29 +205,35 @@ extension HomeViewController: UIScrollViewDelegate {
                 let frame = CGRectMake(0, tableView.contentSize.height, tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight)
                 loadingMoreView?.frame = frame
                 loadingMoreView!.startAnimating()
-                if self.style == HomeViewControllerStyle.HOME {
-                    Tweet.loadMoreHomeTimelineWithLastTweet((self.tweets?.last)!) {
+                if self.tweets?.count > 0 {
+                    loadMoreTimelineWithCompletion() {
+                            (tweets: [Tweet]?, error: NSError?) in
+                            if tweets != nil {
+                                self.tweets?.appendContentsOf(tweets!)
+                                self.hideFooterView = tweets?.count > 0
+                                self.loadingMoreView!.stopAnimating()
+                                self.tableView.reloadData()
+                                
+                            } else {
+                                print("\(error)")
+                            }
+                            self.isMoreDataLoading = false
+                        }
+                    
+                } else {
+                    getHomeTimelineWithCompletion() {
                         (tweets: [Tweet]?, error: NSError?) in
                         if tweets != nil {
-                            self.tweets?.appendContentsOf(tweets!)
+                            self.tweets = tweets
+                            self.hideFooterView = tweets?.count > 0
                             self.loadingMoreView!.stopAnimating()
                             self.tableView.reloadData()
-                            self.isMoreDataLoading = false
+                            Tweet.currentTweets = tweets
+                            
                         } else {
-                            print("\(error)")
+                            print(error)
                         }
-                    }
-                } else if self.style == HomeViewControllerStyle.MENTIONS {
-                    Tweet.loadMoreMentionsWithLastTweet((self.tweets?.last)!) {
-                        (tweets: [Tweet]?, error: NSError?) in
-                        if tweets != nil {
-                            self.tweets?.appendContentsOf(tweets!)
-                            self.loadingMoreView!.stopAnimating()
-                            self.tableView.reloadData()
-                            self.isMoreDataLoading = false
-                        } else {
-                            print("\(error)")
-                        }
+                        self.isMoreDataLoading = false
                     }
                 }
             }

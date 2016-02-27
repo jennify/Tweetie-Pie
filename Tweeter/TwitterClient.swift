@@ -102,7 +102,7 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
     }
     
     func requestTwitterWithTweetResponse(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (tweet: Tweet?, error: NSError?) -> ()) {
-        requestTwitter(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: parameters) {
+        requestTwitter(mode, url: url, queryParams: queryParams, parameters: parameters) {
             (response: AnyObject?, error: NSError?) in
             var tweet: Tweet? = nil
             if response != nil {
@@ -112,16 +112,9 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         }
     }
     
-    func requestTwitterWithTweetArrayResponse(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
-        requestTwitter(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: parameters) {
-            (response: AnyObject?, error: NSError?) in
-            let tweets = Tweet.tweetsWithArray(response as! [NSDictionary])
-            completion(tweets:tweets, error: error)
-        }
-    }
     
     func requestTwitterWithUserResponse(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (user: User?, error: NSError?) -> ()) {
-        requestTwitter(NetworkRequest.POST, url: url, queryParams: queryParams, parameters: parameters) {
+        requestTwitter(mode, url: url, queryParams: queryParams, parameters: parameters) {
             (response: AnyObject?, error: NSError?) in
             var user: User? = nil
             if response != nil {
@@ -131,22 +124,27 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         }
     }
     
+    func requestTwitterWithTweetArrayResponse(mode: NetworkRequest, url: String, queryParams: [String:String]?, parameters: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
+        requestTwitter(mode, url: url, queryParams: queryParams, parameters: parameters) {
+            (response: AnyObject?, error: NSError?) in
+            var tweets: [Tweet]? = nil
+            if response != nil {
+                tweets = Tweet.tweetsWithArray(response as! [NSDictionary])
+            }
+            completion(tweets:tweets, error: error)
+        }
+    }
+    
     func homeTimelineWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
-        
 //        new_params["include_entities"] = "true"
-        GET("1.1/statuses/home_timeline.json", parameters: parameters, success:  { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
-                let tweets = Tweet.tweetsWithArray(response as! [NSDictionary])
-                completion(tweets: tweets, error: nil)
-            }, failure: { (operation: AFHTTPRequestOperation?, error: NSError) -> Void in
-                completion(tweets: nil, error: error)
-        })
+        let url = "1.1/statuses/home_timeline.json"
+        requestTwitterWithTweetArrayResponse(NetworkRequest.GET, url: url, queryParams: nil, parameters: parameters, completion: completion)
+
     }
     
     func mentionsWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
-        let url = "https://api.twitter.com/1.1/statuses/mentions_timeline.json"
-//        var new_params = parameters
-//        new_params["include_entities"] = true
-        requestTwitterWithTweetArrayResponse(NetworkRequest.POST, url: url, queryParams: nil, parameters: parameters, completion: completion)
+        let url = "1.1/statuses/mentions_timeline.json"
+        requestTwitterWithTweetArrayResponse(NetworkRequest.GET, url: url, queryParams: nil, parameters: parameters, completion: completion)
 
     }
     

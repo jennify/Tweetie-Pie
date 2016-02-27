@@ -1,6 +1,6 @@
 # Project 4 - Tweetie Pie
 
-Time spent: 5 hours spent in total
+Time spent: 10 hours spent in total
 
 ## User Stories
 
@@ -8,10 +8,10 @@ The following **required** functionality is completed:
 
 - [x] Hamburger menu
    - [x] Dragging anywhere in the view should reveal the menu.
-   - [ ] The menu should include links to your profile, the home timeline, and the mentions view.
+   - [x] The menu should include links to your profile, the home timeline, and the mentions view.
    - [x] The menu can look similar to the example or feel free to take liberty with the UI.
-- [ ] Profile page
-   - [ ] Contains the user header view
+- [x] Profile page
+   - [x] Contains the user header view
    - [x] Contains a section with the users basic stats: # tweets, # following, # followers
 - [x] Home Timeline
    - [x] Tapping on a user image should bring up that user's profile page
@@ -21,7 +21,7 @@ The following **optional** features are implemented:
 - [ ] Profile Page
    - [ ] Implement the paging view for the user description.
    - [ ] As the paging view moves, increase the opacity of the background screen. See the actual Twitter app for this effect
-   - [ ] Pulling down the profile page should blur and resize the header image.
+   - [x] Pulling down the profile page should blur and resize the header image.
 - [ ] Account switching
    - [ ] Long press on tab bar to bring up Account view with animation
    - [ ] Tap account to switch to
@@ -32,6 +32,9 @@ The following **optional** features are implemented:
 The following **additional** features are implemented:
 
 - [x] Follower from users page + increment/decrement followers count.
+- [x] UserProfile: Some animation with User Profile Image
+- [x] UserProfile: Animating in the name
+- [x] UserProfile: Pull down to increase size of the background image.
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
