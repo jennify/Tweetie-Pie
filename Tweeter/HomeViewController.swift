@@ -12,7 +12,7 @@ let kHamburgerPressed = "kHamburgerPressed"
 enum HomeViewControllerStyle {
     case MENTIONS, HOME
 }
-class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, HomeTweetCellDelegate {
+class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, HomeTweetCellDelegate, TweetCellDelegate {
     var tweets: [Tweet]?
     @IBOutlet weak var tableView: UITableView!
     var isMoreDataLoading = false
@@ -29,6 +29,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.dataSource = self
         tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.registerClass(TweetCell.self, forCellReuseIdentifier: "TweetCell")
         
         self.refreshControlInit()
         self.scrollViewInit()
@@ -132,7 +133,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("HomeTweetCell", forIndexPath: indexPath) as! HomeTweetCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("TweetCell", forIndexPath: indexPath) as! TweetCell
+//        let cell = tableView.dequeueReusableCellWithIdentifier("HomeTweetCell", forIndexPath: indexPath) as! HomeTweetCell
         cell.delegate = self
         cell.tweet = self.tweets![indexPath.row]
         return cell
@@ -142,7 +144,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         return self.tweets?.count ?? 0
     }
     
-    func performSegueToIdentifier(identifier: String, sender: HomeTweetCell) {
+    func performSegueToIdentifier(identifier: String, sender: TweetCell) {
+        self.performSegueWithIdentifier(identifier, sender: sender)
+    }
+    
+    func performSegueToIdentifierHome(identifier: String, sender: HomeTweetCell) {
         self.performSegueWithIdentifier(identifier, sender: sender)
     }
 

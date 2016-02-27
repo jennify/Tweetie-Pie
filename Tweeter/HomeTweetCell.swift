@@ -10,7 +10,7 @@ import UIKit
 import AFNetworking
 
 @objc protocol HomeTweetCellDelegate {
-    optional func performSegueToIdentifier(identifier: String, sender: HomeTweetCell)
+    optional func performSegueToIdentifierHome(identifier: String, sender: HomeTweetCell)
 }
 
 class HomeTweetCell: UITableViewCell {
@@ -107,7 +107,7 @@ class HomeTweetCell: UITableViewCell {
         if let _ = gesture.view as? UIImageView {
             // Go to profile view after tapping on user image.
             if self.delegate != nil {
-                self.delegate!.performSegueToIdentifier?("userProfileFromHomeSegue", sender: self)
+                self.delegate!.performSegueToIdentifierHome?("userProfileFromHomeSegue", sender: self)
             }
         }
     }
