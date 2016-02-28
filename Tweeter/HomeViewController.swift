@@ -87,8 +87,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         let destViewController = segue.destinationViewController
 
         if segue.identifier == "replySegue" {
-            let button = sender as? UIButton
-            let cell = button?.superview?.superview as! TweetCell
+            let cell = sender as! TweetCell
             
             let navigationController = destViewController as? UINavigationController
             let composerViewController = navigationController?.topViewController as? ComposeViewController

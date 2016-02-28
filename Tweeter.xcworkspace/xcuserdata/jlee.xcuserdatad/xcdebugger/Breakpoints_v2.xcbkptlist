@@ -460,11 +460,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Tweeter/HomeViewController.swift"
-            timestampString = "478339275.35647"
+            timestampString = "478384123.017296"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "148"
-            endingLineNumber = "148"
+            startingLineNumber = "147"
+            endingLineNumber = "147"
             landmarkName = "HomeViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -481,7 +481,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "113"
             endingLineNumber = "113"
-            landmarkName = "myTweets(_:)"
+            landmarkName = "userTweets(_:completion:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

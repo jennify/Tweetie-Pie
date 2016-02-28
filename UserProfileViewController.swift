@@ -121,6 +121,17 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         self.performSegueWithIdentifier(identifier, sender: sender)
     }
     
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "replySegue" {
+            let cell = sender as! TweetCell
+            let destViewController = segue.destinationViewController
+            let navigationController = destViewController as? UINavigationController
+            let composerViewController = navigationController?.topViewController as? ComposeViewController
+            composerViewController?.inReplyToTweet = cell.tweet
+            
+        }
+    }
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         
@@ -236,11 +247,7 @@ extension UserProfileViewController: UIScrollViewDelegate {
             UIView.transitionWithView(self.profileImageView, duration: 2.5, options: UIViewAnimationOptions.CurveEaseOut, animations: {
                 self.profileImageView.transform = CGAffineTransformScale(self.profileImageView.transform, 1.0, 0.0)
                 }, completion: nil)
-            
-            UIView.transitionWithView(self.profileImageView, duration: 5, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
-                    self.profileImageView.alpha = 0.0
-                }, completion: nil)
-            
+
             self.blurView = blurView
         }
 
@@ -259,7 +266,6 @@ extension UserProfileViewController: UIScrollViewDelegate {
             
             
             UIView.transitionWithView(self.profileImageView, duration: 0.3, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
-                self.profileImageView.alpha = 1.0
                 self.profileImageView.transform = self.profileTransform
 
             }, completion: nil)

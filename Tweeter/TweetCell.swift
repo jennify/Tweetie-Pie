@@ -108,7 +108,9 @@ class TweetCell: UITableViewCell {
         }
     }
     
-    
+    @IBAction func onReply(sender: AnyObject) {
+        self.delegate?.performSegueToIdentifier?("replySegue", sender: self)
+    }
     
     @IBAction func onRetweet(sender: AnyObject) {
         if self.retweeted == false {

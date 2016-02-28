@@ -45,6 +45,9 @@
                             <constraint firstAttribute="width" constant="25" id="ZAv-hc-Lj1"/>
                         </constraints>
                         <state key="normal" image="reply-dark"/>
+                        <connections>
+                            <action selector="onReply:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="aTu-BB-rJw"/>
+                        </connections>
                     </button>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mlV-MT-E2F">
                         <rect key="frame" x="146" y="350" width="25" height="25"/>
