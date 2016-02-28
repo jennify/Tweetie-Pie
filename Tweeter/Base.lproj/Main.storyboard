@@ -367,7 +367,7 @@
                                             <outlet property="usernameLabel" destination="cjd-Ry-qZS" id="27c-vs-RSd"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="TweetCell" rowHeight="110" id="Fh8-tl-6Ge" customClass="HomeTweetCell" customModule="Tweeter" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ProfileTweetCell" rowHeight="110" id="Fh8-tl-6Ge">
                                         <rect key="frame" x="0.0" y="451" width="320" height="110"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Fh8-tl-6Ge" id="8ng-jE-B3U">

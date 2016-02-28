@@ -63,6 +63,7 @@ class TweetViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+
         nameLabel.text = tweet.user?.name
         if tweet.user?.screenname != nil {
             usernameLabel.text = "@" + (tweet.user?.screenname)!

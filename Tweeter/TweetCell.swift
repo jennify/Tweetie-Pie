@@ -5,9 +5,6 @@
 //  Created by Jennifer Lee on 2/27/16.
 //  Copyright © 2016 Jennifer Lee. All rights reserved.
 //
-@objc protocol TweetCellDelegate {
-    optional func performSegueToIdentifier(identifier: String, sender: TweetCell)
-}
 
 
 import UIKit
@@ -25,8 +22,8 @@ class TweetCell: UITableViewCell {
     @IBOutlet weak var retweetButton: UIButton!
     @IBOutlet weak var tweetMediaImageView: UIImageView!
     @IBOutlet weak var tweetMediaImageViewConstraint: NSLayoutConstraint!
-    
-    
+
+
     var delegate: TweetCellDelegate?
     
     var favorited: Bool! {
@@ -50,8 +47,7 @@ class TweetCell: UITableViewCell {
     
     var tweet: Tweet! {
         didSet {
-            self.layoutIfNeeded()
-            if tweet != nil {
+            if nameLabel != nil {
                 nameLabel.text = tweet.user?.name
                 if tweet.user?.screenname != nil {
                     usernameLabel.text = "@" + (tweet.user?.screenname)!
@@ -104,12 +100,11 @@ class TweetCell: UITableViewCell {
         }
     }
     
-    @IBAction func profileImageTapped(gesture: UITapGestureRecognizer) {
+    func profileImageTapped(gesture: UITapGestureRecognizer) {
         if let _ = gesture.view as? UIImageView {
             // Go to profile view after tapping on user image.
-            if self.delegate != nil {
-                self.delegate!.performSegueToIdentifier?("userProfileFromHomeSegue", sender: self)
-            }
+            self.delegate?.performSegueToIdentifier?("userProfileFromHomeSegue", sender: self)
+            
         }
     }
     
@@ -157,8 +152,9 @@ class TweetCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-    }
 
+    }
+    
     override func setSelected(selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 

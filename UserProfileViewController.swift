@@ -8,7 +8,7 @@
 
 import UIKit
 
-class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class UserProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, TweetCellDelegate {
     var user: User?
     @IBOutlet weak var tableView: UITableView!
     var originalBannerHeight: CGFloat = 100.0
@@ -20,6 +20,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     var headerView: UITableViewHeaderFooterView!
     var headerNameLabel: UILabel!
     var profileTransform: CGAffineTransform!
+    var tweets: [Tweet]?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,14 +30,22 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.sectionHeaderHeight = UITableViewAutomaticDimension;
         tableView.estimatedSectionHeaderHeight = originalBannerHeight;
-        
+        tableView.registerNib(UINib(nibName: "TweetCell", bundle: nil), forCellReuseIdentifier: "TweetCell")
+
         originalBannerHeight = 200
         currentBannerHeight = originalBannerHeight
-        
+
         self.navigationController?.navigationBarHidden = true
-//        self.navigationController?.navigationItem.backBarButtonItem
-        
-        
+
+        Tweet.userTweets(self.user?.screenname) {
+            (tweet: [Tweet]?, error: NSError?) in
+            if error == nil {
+                self.tweets = tweet
+                self.tableView.reloadData()
+            } else {
+                print(error)
+            }
+        }
     }
     
     func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
@@ -88,6 +97,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         self.headerView = header
         return header
     }
+    
     func onBackButton(sender: UIButton) {
         
         if self.user!.name == User.currentUser!.name {
@@ -107,12 +117,18 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
         // Dispose of any resources that can be recreated.
     }
     
+    func performSegueToIdentifierHome(identifier: String, sender: TweetCell) {
+        self.performSegueWithIdentifier(identifier, sender: sender)
+    }
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         
         if indexPath.row >= 1 {
-            let cell = tableView.dequeueReusableCellWithIdentifier("TweetCell")
-            return cell!
+            let cell = tableView.dequeueReusableCellWithIdentifier("TweetCell") as! TweetCell
+            cell.delegate = self
+            cell.tweet = self.tweets?[indexPath.row - 1]
+            return cell
         } else {
             let cell = tableView.dequeueReusableCellWithIdentifier("UserStatsCell") as! UserStateCell
             cell.user = user
@@ -127,7 +143,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 20
+        return (self.tweets?.count ?? 0) + 1
     }
     
     func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -156,27 +172,21 @@ extension UserProfileViewController: UIScrollViewDelegate {
 
         let yOffset = scrollView.contentOffset.y + 44
         
-        if tableView.dragging {
-            if yOffset < 0  {
-                currentBannerHeight = originalBannerHeight - yOffset
-                updateBanner(yOffset)
-            } else if(yOffset < originalBannerHeight - destinationBannerHeight) {
-                currentBannerHeight = originalBannerHeight - yOffset
-                updateBanner(nil)
-                removeBlurView()
-                
-            } else {
-                currentBannerHeight = destinationBannerHeight
-                updateBanner(nil)
-                addBlurView()
-            }
-
+        if yOffset < 0  {
+            currentBannerHeight = originalBannerHeight - yOffset
+            updateBanner(yOffset)
+            
+        } else if(yOffset < originalBannerHeight - destinationBannerHeight) {
+            currentBannerHeight = originalBannerHeight - yOffset
+            updateBanner(nil)
+            removeBlurView()
+            
         } else {
-            if yOffset < 0 {
-                currentBannerHeight = originalBannerHeight - yOffset
-                updateBanner(yOffset)
-            }
+            currentBannerHeight = destinationBannerHeight
+            updateBanner(nil)
+            addBlurView()
         }
+
     }
     
     func updateBanner(yOffset: CGFloat?) {
@@ -223,11 +233,11 @@ extension UserProfileViewController: UIScrollViewDelegate {
                 self.bannerImageView.addSubview(self.headerNameLabel)
             }, completion:  nil)
 
-            UIView.transitionWithView(self.profileImageView, duration: 0.1, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
-                self.profileImageView.transform = CGAffineTransformScale(self.profileImageView.transform, 0.5, 0.5)
+            UIView.transitionWithView(self.profileImageView, duration: 2.5, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                self.profileImageView.transform = CGAffineTransformScale(self.profileImageView.transform, 1.0, 0.0)
                 }, completion: nil)
             
-            UIView.transitionWithView(self.profileImageView, duration: 0.5, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
+            UIView.transitionWithView(self.profileImageView, duration: 5, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
                     self.profileImageView.alpha = 0.0
                 }, completion: nil)
             
@@ -252,10 +262,8 @@ extension UserProfileViewController: UIScrollViewDelegate {
                 self.profileImageView.alpha = 1.0
                 self.profileImageView.transform = self.profileTransform
 
-                }, completion: nil)
+            }, completion: nil)
 
-            
-            
         }
     }
     

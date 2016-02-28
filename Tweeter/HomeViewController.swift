@@ -12,14 +12,17 @@ let kHamburgerPressed = "kHamburgerPressed"
 enum HomeViewControllerStyle {
     case MENTIONS, HOME
 }
+@objc protocol TweetCellDelegate {
+    optional func performSegueToIdentifier(identifier: String, sender: TweetCell)
+}
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, HomeTweetCellDelegate, TweetCellDelegate {
     var tweets: [Tweet]?
     @IBOutlet weak var tableView: UITableView!
-    var isMoreDataLoading = false
+    var isMoreDataLoading = true
     var loadingMoreView: InfiniteScrollActivityView?
     var style: HomeViewControllerStyle!
 
-    var hideFooterView: Bool = true
+    var hideFooterView: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,11 +32,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.dataSource = self
         tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.registerClass(TweetCell.self, forCellReuseIdentifier: "TweetCell")
+        tableView.registerNib(UINib(nibName: "TweetCell", bundle: nil), forCellReuseIdentifier: "TweetCell")
         
         self.refreshControlInit()
         self.scrollViewInit()
-//        Tweet.currentTweets = nil
+        Tweet.currentTweets = nil
         
         // Network request to get initial data + Caching.
         getHomeTimelineWithCompletion {
@@ -84,23 +87,22 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         let destViewController = segue.destinationViewController
 
         if segue.identifier == "replySegue" {
-            
             let button = sender as? UIButton
-            let cell = button?.superview?.superview as? HomeTweetCell
+            let cell = button?.superview?.superview as! TweetCell
             
             let navigationController = destViewController as? UINavigationController
             let composerViewController = navigationController?.topViewController as? ComposeViewController
-            composerViewController?.inReplyToTweet = cell?.tweet
+            composerViewController?.inReplyToTweet = cell.tweet
 
         } else if segue.identifier == "detailsSegue" {
-            let cell = sender as? HomeTweetCell
+            let cell = sender as! TweetCell
             let detailsViewController = destViewController as? TweetViewController
-            detailsViewController?.tweet = cell?.tweet
+            detailsViewController?.tweet = cell.tweet
             
         } else if segue.identifier == "userProfileFromHomeSegue" {
-            let cell = sender as? HomeTweetCell
+            let cell = sender as! TweetCell
             let profileViewController = destViewController as? UserProfileViewController
-            profileViewController?.user = cell?.tweet.user
+            profileViewController?.user = cell.tweet.user
             
         }
     }
@@ -133,8 +135,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("TweetCell", forIndexPath: indexPath) as! TweetCell
-//        let cell = tableView.dequeueReusableCellWithIdentifier("HomeTweetCell", forIndexPath: indexPath) as! HomeTweetCell
+
+        let cell = tableView.dequeueReusableCellWithIdentifier("TweetCell") as! TweetCell
         cell.delegate = self
         cell.tweet = self.tweets![indexPath.row]
         return cell
@@ -245,5 +247,10 @@ extension HomeViewController: UIScrollViewDelegate {
             }
         }
     }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        self.performSegueToIdentifier("detailsSegue", sender: self.tableView.cellForRowAtIndexPath(indexPath) as! TweetCell)
 
+    }
+    
 }

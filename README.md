@@ -1,6 +1,6 @@
 # Project 4 - Tweetie Pie
 
-Time spent: 10 hours spent in total
+Time spent: 16 hours spent in total
 
 ## User Stories
 
@@ -38,15 +38,14 @@ The following **additional** features are implemented:
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
-  1.
-  2.
-
+  1. Better animation of the profile image view disappearing.
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+![Main demo](HW4-main.gif)
+![No tweet view](HW4-tmp.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
@@ -56,7 +55,7 @@ Describe any challenges encountered while building the app.
 
 ## License
 
-    Copyright [yyyy] [name of copyright owner]
+    Copyright 2016 Jennifer Lee
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -72,8 +71,8 @@ Describe any challenges encountered while building the app.
 # Project 3 - Tweetie Pie
 Tweetie Pie is a basic twitter app to read and compose tweets from the [Twitter API](https://apps.twitter.com/).
 
-Time spent: **X** hours spent in total
-16 hrs
+Time spent: 16 hours spent in total
+
 ## User Stories
 
 The following **required** functionality is completed:

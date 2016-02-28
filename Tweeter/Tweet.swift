@@ -108,7 +108,10 @@ class Tweet: NSObject {
             TwitterClient.sharedInstance.publishTweet(text,in_reply_tweet_id:in_reply_tweet_id, completion: completion)
         }
     }
-
+    
+    class func userTweets(username: String?, completion:(tweets: [Tweet]?, error:NSError?) -> ()) {
+        TwitterClient.sharedInstance.myTweets(username, parameters:nil, completion: completion)
+    }
     
     class func arrayWithTweets(tweets: [Tweet]) -> [NSDictionary]{
         var dataArray = [NSDictionary]()

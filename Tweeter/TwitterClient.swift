@@ -76,6 +76,7 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         if urlWithQueryParams[urlWithQueryParams.endIndex.predecessor()] == "&" {
             urlWithQueryParams = String(urlWithQueryParams.characters.dropLast())
         }
+        print(urlWithQueryParams)
 
         return urlWithQueryParams
     }
@@ -136,10 +137,17 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
     }
     
     func homeTimelineWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
-//        new_params["include_entities"] = "true"
+//        var query_Params = ["include_entities": "true"]
+
         let url = "1.1/statuses/home_timeline.json"
         requestTwitterWithTweetArrayResponse(NetworkRequest.GET, url: url, queryParams: nil, parameters: parameters, completion: completion)
 
+    }
+    
+    func myTweets(screen_name: String? ,parameters: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
+        let url = "1.1/statuses/user_timeline.json"
+        let queryParams: [String: String]? = ["screen_name" : screen_name!]
+        requestTwitterWithTweetArrayResponse(NetworkRequest.GET, url: url, queryParams: queryParams, parameters: parameters, completion: completion)
     }
     
     func mentionsWithParams(parameters: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
