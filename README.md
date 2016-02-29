@@ -19,7 +19,7 @@ The following **required** functionality is completed:
 The following **optional** features are implemented:
 
 - [ ] Profile Page
-   - [ ] Implement the paging view for the user description.
+   - [x] Implement the paging view for the user description. (Tweets + Likes)
    - [ ] As the paging view moves, increase the opacity of the background screen. See the actual Twitter app for this effect
    - [x] Pulling down the profile page should blur and resize the header image.
 - [ ] Account switching
@@ -46,6 +46,7 @@ Here's a walkthrough of implemented user stories:
 
 ![Main demo](HW4-main.gif)
 ![No tweet view](HW4-tmp.gif)
+![Paging](HW4-paging.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
