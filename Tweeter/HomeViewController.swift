@@ -10,18 +10,19 @@ import UIKit
 
 let kHamburgerPressed = "kHamburgerPressed"
 enum HomeViewControllerStyle {
-    case MENTIONS, HOME
+    case MENTIONS, HOME, FAVORITES, USER_TWEETS
 }
 @objc protocol TweetCellDelegate {
     optional func performSegueToIdentifier(identifier: String, sender: TweetCell)
 }
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, HomeTweetCellDelegate, TweetCellDelegate {
     var tweets: [Tweet]?
+    var user: User?
     @IBOutlet weak var tableView: UITableView!
     var isMoreDataLoading = true
     var loadingMoreView: InfiniteScrollActivityView?
     var style: HomeViewControllerStyle!
-
+    var pageIndex: Int?
     var hideFooterView: Bool = false
 
     override func viewDidLoad() {
@@ -45,6 +46,9 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             Tweet.currentTweets = tweets
             self.hideFooterView = tweets?.count > 0
             self.tableView.reloadData()
+        }
+        if self.user == nil {
+            self.user = User.currentUser
         }
         
         // Add observer for any new tweets created by current user.
@@ -113,6 +117,10 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                 Tweet.homeTimelineWithParams(nil, completion: completion)
             } else if self.style == HomeViewControllerStyle.MENTIONS {
                 Tweet.mentionsWithParams(nil, completion: completion)
+            } else if self.style == HomeViewControllerStyle.FAVORITES {
+                Tweet.userFavorites(self.user?.screenname, completion: completion)
+            } else if self.style == HomeViewControllerStyle.USER_TWEETS {
+                Tweet.userTweets(self.user?.screenname, completion: completion)
             }
         } else {
             self.tweets = Tweet.currentTweets

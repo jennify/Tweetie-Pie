@@ -21,7 +21,18 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     var headerNameLabel: UILabel!
     var profileTransform: CGAffineTransform!
     var tweets: [Tweet]?
+    var pageViewController: UIPageViewController?
+    var pageViewControllers: [UIViewController]?
+    var newPageIndex: Int?
 
+    
+    @IBAction func userProfileTimelineSegment(sender: AnyObject) {
+        let segment = sender as! UISegmentedControl
+        setPagingViewController(segment.selectedSegmentIndex)
+    }
+    
+    @IBOutlet weak var footerView: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
@@ -46,6 +57,37 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
                 print(error)
             }
         }
+        let options: [String:AnyObject]? = [UIPageViewControllerOptionSpineLocationKey : NSNumber(integer: UIPageViewControllerSpineLocation.Mid.rawValue )]
+        let pageViewController = UIPageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: options)
+        pageViewController.delegate = self
+        pageViewController.dataSource = self
+        self.pageViewController = pageViewController
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let userTweetsVC = storyboard.instantiateViewControllerWithIdentifier("HomeViewController") as! HomeViewController
+        userTweetsVC.style = HomeViewControllerStyle.USER_TWEETS
+        userTweetsVC.user = self.user
+        userTweetsVC.pageIndex = 0
+        
+
+        let favoritesVC = storyboard.instantiateViewControllerWithIdentifier("HomeViewController") as! HomeViewController
+        favoritesVC.style = HomeViewControllerStyle.FAVORITES
+        favoritesVC.user = self.user
+        favoritesVC.pageIndex = 1
+        
+        self.pageViewControllers = [userTweetsVC, favoritesVC]
+        let initialViewController = [userTweetsVC]
+        self.footerView.backgroundColor = UIColor.lightGrayColor()
+        
+        pageViewController.setViewControllers(initialViewController, direction: .Reverse, animated: true, completion: nil)
+        self.newPageIndex = 0
+        pageViewController.view.frame = self.footerView.bounds
+        self.addChildViewController(pageViewController)
+        self.footerView.addSubview(pageViewController.view)
+        pageViewController.didMoveToParentViewController(self)
+        self.tableView.reloadData()
+        
     }
     
     func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
@@ -54,7 +96,7 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
     
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         // Initialize header
-        let header = UITableViewHeaderFooterView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: originalBannerHeight))
+        let header = UITableViewHeaderFooterView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: currentBannerHeight))
         
         // Banner Image.
         let bannerImageView = UIImageView(frame: header.bounds)
@@ -149,12 +191,14 @@ class UserProfileViewController: UIViewController, UITableViewDelegate, UITableV
             cell.followingCountLabel.text = "\(user!.following_count!)"
             cell.tweetCountLabel.text = "\(user!.tweet_count!)"
             cell.followed = user!.following!
+            cell.userStatTimelineSegment.selectedSegmentIndex = self.newPageIndex!
             return cell
         }
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (self.tweets?.count ?? 0) + 1
+        return 1
+//        return (self.tweets?.count ?? 0) + 1
     }
     
     func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -182,11 +226,9 @@ extension UserProfileViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(scrollView: UIScrollView) {
 
         let yOffset = scrollView.contentOffset.y + 44
-        
         if yOffset < 0  {
             currentBannerHeight = originalBannerHeight - yOffset
             updateBanner(yOffset)
-            
         } else if(yOffset < originalBannerHeight - destinationBannerHeight) {
             currentBannerHeight = originalBannerHeight - yOffset
             updateBanner(nil)
@@ -197,7 +239,6 @@ extension UserProfileViewController: UIScrollViewDelegate {
             updateBanner(nil)
             addBlurView()
         }
-
     }
     
     func updateBanner(yOffset: CGFloat?) {
@@ -274,5 +315,49 @@ extension UserProfileViewController: UIScrollViewDelegate {
     }
     
 
+}
+extension UserProfileViewController: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+    func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
+        let vc = viewController as! HomeViewController
+        let pageIndex = vc.pageIndex
+        return viewControllerAtIndex(pageIndex! + 1)
+    }
+    func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
+        let vc = viewController as! HomeViewController
+        let pageIndex = vc.pageIndex
+        
+        return viewControllerAtIndex(pageIndex! - 1)
+    }
+    
+    func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [UIViewController]) {
+        let vc = pendingViewControllers.first as! HomeViewController
+        let pageIndex = vc.pageIndex
+        if pageIndex >= 0 && pageIndex < self.pageViewControllers!.count {
+            self.newPageIndex = pageIndex
+            self.tableView.reloadData()
+            
+        }
+        
+    }
+    
+    func viewControllerAtIndex(index: Int) -> UIViewController? {
+        if index < 0 || index >= self.pageViewControllers!.count {
+            return nil
+        }
+        return self.pageViewControllers![index]
+    }
+    
+    func presentationIndexForPageViewController(pageViewController: UIPageViewController) -> Int {
+        return 0
+    }
+    
+    func presentationCountForPageViewController(pageViewController: UIPageViewController) -> Int {
+        return self.pageViewControllers?.count ?? 0
+    }
+    
+    func setPagingViewController(index: Int) {
+        let vcs = [viewControllerAtIndex(index)!]
+        self.pageViewController?.setViewControllers(vcs, direction: .Forward, animated: true, completion: nil)
+    }
 }
 

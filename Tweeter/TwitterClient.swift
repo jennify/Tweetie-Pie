@@ -63,6 +63,7 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         let url = "1.1/favorites/destroy.json"
         requestTwitterWithTweetResponse(NetworkRequest.POST, url: url, queryParams: ["id" : id_str], parameters: nil, completion: completion)
     }
+
     
     func buildURLWithQueryParams(url: String, queryParams: [String:String]?) -> String {
         var urlWithQueryParams = url
@@ -142,6 +143,12 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         let url = "1.1/statuses/home_timeline.json"
         requestTwitterWithTweetArrayResponse(NetworkRequest.GET, url: url, queryParams: nil, parameters: parameters, completion: completion)
 
+    }
+    
+    func favoriteTimeline(screen_name: String? ,parameters: NSDictionary?, completion: (tweets: [Tweet]?, error:NSError?) -> ()) {
+        let url = "1.1/favorites/list.json"
+        let queryParams: [String: String]? = ["screen_name" : screen_name!]
+        requestTwitterWithTweetArrayResponse(NetworkRequest.GET, url: url, queryParams: queryParams, parameters: parameters, completion: completion)
     }
     
     func myTweets(screen_name: String? ,parameters: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {

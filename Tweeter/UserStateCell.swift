@@ -10,6 +10,7 @@ import UIKit
 
 class UserStateCell: UITableViewCell {
 
+    @IBOutlet weak var userStatTimelineSegment: UISegmentedControl!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var followButton: UIButton!
@@ -52,6 +53,10 @@ class UserStateCell: UITableViewCell {
             }
         }
     }
+    
+    @IBAction func onUserStatTimelineSegmentChanged(sender: AnyObject) {
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

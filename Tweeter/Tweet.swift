@@ -113,6 +113,10 @@ class Tweet: NSObject {
         TwitterClient.sharedInstance.myTweets(username, parameters:nil, completion: completion)
     }
     
+    class func userFavorites(username: String?, completion:(tweets: [Tweet]?, error:NSError?) -> () ) {
+        TwitterClient.sharedInstance.favoriteTimeline(username, parameters:nil, completion: completion)
+    }
+
     class func arrayWithTweets(tweets: [Tweet]) -> [NSDictionary]{
         var dataArray = [NSDictionary]()
         

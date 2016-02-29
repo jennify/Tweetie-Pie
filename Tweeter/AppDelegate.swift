@@ -29,6 +29,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             hamburgerViewController.menuViewController = menuViewController
             window?.rootViewController = hamburgerViewController
         }
+        
+        let pageControl = UIPageControl.appearance()
+        pageControl.pageIndicatorTintColor = UIColor.lightGrayColor()
+        pageControl.currentPageIndicatorTintColor = UIColor.blackColor()
+        pageControl.backgroundColor = UIColor.whiteColor()
+        pageControl.contentVerticalAlignment = .Top
         return true
     }
     
